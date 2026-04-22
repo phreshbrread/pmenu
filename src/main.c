@@ -1,7 +1,13 @@
 #include <stdio.h>
+#include <ncurses.h>
 
 int main() {
-    printf("Greetings, friend\n");
+    initscr();
+    printw("Greetings, friend.");
+    refresh();
+    getch();
+    endwin();
+
     return 0;
 }
 
