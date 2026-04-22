@@ -16,6 +16,7 @@
         nativeBuildInputs = [ pkgs.pkg-config ];
         buildInputs = with pkgs; [
           gcc
+          ncurses
         ];
       };
     };
