@@ -2,31 +2,47 @@
 #include <ncurses.h>
 
 /* Declare variables */
-int startx = 0;
-int starty = 0;
-int rows, cols;
+int startx  = 0;
+int starty  = 0;
+int rows    = 0;
+int cols    = 0;
+int input   = 0;
 
 char *options[] = {"Shutdown", "Reboot", "Suspend", "Cancel"};
-/* --------------------------------------------------------- */
+int option_count = sizeof(options) / sizeof(char *);    // Get number of options
+/* -------------------------------------------------------------------------- */
 
 int main() {
-    initscr(); // Initialise curses mode
-    keypad(stdscr, TRUE); // Enable arrow key usage
-    noecho();
-    cbreak(); // Disable line buffering
-
+    initscr();              // Initialise curses mode
+    cbreak();               // Disable line buffering
+    noecho();               // Don't echo characters back to terminal
+    keypad(stdscr, TRUE);   // Enable special keys - need for arrows
     
+    /* Testing */
+    printw("Option count: %i", option_count);
+    /* ----------------------------------- */
+
     // Loop to account for window resizing
     while (true) {
-        getmaxyx(stdscr, rows, cols); // Get size of terminal
-        erase(); // Clear previous output
+        getmaxyx(stdscr, rows, cols);   // Get size of terminal
+        erase();                        // Clear previous output
 
-        mvaddstr(rows/2, cols/3, "Test");
-        //mvaddstr();
+        printw("Working");
         refresh();
+
+       /* Handle input here */
+       input = getch();
+       if (input == KEY_UP) {
+           // Move selection up
+       } else if (input == KEY_DOWN) {
+           // Move selection down
+       } else {
+           // Do nothing
+       }
+       /* ----------- */
     }
 
-    endwin(); // End curses mode
+    endwin();   // End curses mode
     return 0;
 }
 
