@@ -1,37 +1,24 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <ncurses.h>
 
+int main() {
+    initscr(); // Initialise curses mode
+    keypad(stdscr, TRUE); // Enable arrow key usage
 
-int init_window () {
-    // Attempt to open default system terminal
-    // Return 1 if it fails
-    if (system("$TERM") != 0) {
-        printf("Couldn't open a terminal\n");
-        return 1;
+    int rows, cols;
+
+    // Loop to account for window resizing
+    while (true) {
+        getmaxyx(stdscr, rows, cols); // Get size of terminal
+        erase(); // Clear previous output
+
+        mvprintw(rows/2, cols/3, "Left");
+        refresh();
     }
 
+    endwin(); // End curses mode
     return 0;
 }
-
-int main() {
-    /*
-    initscr(); // Initialise curses mode
-
-    printw("Greetings, friend.");
-    refresh();
-    getch();
-
-
-    endwin(); // End curses mode - free memory, data, etc    
-    */
-
-    init_window();
-
-    return 0;
-}
-
-
 
 /* TODO:
  * 1. Open terminal when run
@@ -40,6 +27,5 @@ int main() {
  * 2. Print 'power off', 'reboot' and 'suspend' options in the middle of the terminal
  * 3. Allow user to select an option
  * 4. Handle selected option appropriately
- *      - Need to determine init system
- *      - Need to figure out how this works on BSD too
+ * 5. Allow for some sort of customisation
 */
