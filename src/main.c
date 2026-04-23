@@ -1,18 +1,28 @@
 #include <stdio.h>
 #include <ncurses.h>
 
+/* Declare variables */
+int startx = 0;
+int starty = 0;
+int rows, cols;
+
+char *options[] = {"Shutdown", "Reboot", "Suspend", "Cancel"};
+/* --------------------------------------------------------- */
+
 int main() {
     initscr(); // Initialise curses mode
     keypad(stdscr, TRUE); // Enable arrow key usage
+    noecho();
+    cbreak(); // Disable line buffering
 
-    int rows, cols;
-
+    
     // Loop to account for window resizing
     while (true) {
         getmaxyx(stdscr, rows, cols); // Get size of terminal
         erase(); // Clear previous output
 
-        mvprintw(rows/2, cols/3, "Left");
+        mvaddstr(rows/2, cols/3, "Test");
+        //mvaddstr();
         refresh();
     }
 
