@@ -40,22 +40,21 @@ int main() {
     items[option_count] = (ITEM *)NULL; // Terminate option list with null pointer
     /* ---------------------------------------- */
 
-    power_menu = new_menu(items);     // Create power menu
+    power_menu = new_menu(items);     // Create menu based off items
     post_menu(power_menu);            // Display power menu
 
     refresh();                                  
 
     /* Handle input */
     while ((input = getch())) {
-        if (input == KEY_UP) {
+        if (input == KEY_UP | input == 'k') {
             menu_driver(power_menu, REQ_UP_ITEM);
-        } else if (input == KEY_DOWN) {
+        } else if (input == KEY_DOWN | input == 'j') {
             menu_driver(power_menu, REQ_DOWN_ITEM);
-        } else if (input == '\n' | input == '\r' | input == KEY_ENTER) {
-            break;
+        } else if (input == KEY_ENTER | input == '\n' | input == '\r') {
         }
     }
-    /* ----------------- */
+    /* ------------ */
 
     /* Free memory used by menu */
     free_item(items[0]);
@@ -68,11 +67,8 @@ int main() {
 }
 
 /* TODO:
- * 1. Open terminal when run
- *      - Just use $TERM to begin with, make more robust later
- *      - Ideally have the terminal appear as a floating window if possible
- * 2. Print 'power off', 'reboot' and 'suspend' options in the middle of the terminal
- * 3. Allow user to select an option
- * 4. Handle selected option appropriately
- * 5. Allow for some sort of customisation
- */
+ * - Create new terminal when run
+ *   - (Might not be necessary)
+ * - Handle selected menu entry
+ * - Center menu options correctly
+ * - Allow for configuration options */
