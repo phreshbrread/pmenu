@@ -11,7 +11,7 @@ int cols    = 0;
 int input   = 0;
 int i       = 0;
 
-char *options[] = {"Shutdown", "Reboot", "Suspend", "Cancel"};
+char *options[] = { "Shutdown", "Reboot", "Suspend", "Cancel" };
 int option_count = sizeof(options) / sizeof(char *);    // Determine number of array entries
 /* -------------------------------------------------------------------------- */
 
@@ -19,41 +19,47 @@ int main() {
     /* Declare menu variables */
     MENU *power_menu;
     ITEM **items;
-    /* ------- */
+    /* ---------------------- */
 
-    initscr();              // Initialise curses mode
-    cbreak();               // Disable line buffering
-    noecho();               // Don't echo characters back to terminal
-    keypad(stdscr, TRUE);   // Enable special keys - need for arrows
+    /* Start curses mode, disable line buffering, disable character echo and enable special keys */
+    initscr();
+    cbreak();
+    noecho(); 
+    keypad(stdscr, TRUE); 
+    /* ----------------------------------------------------------------------------------------- */
 
-    items = (ITEM **)calloc(option_count + 1, sizeof(ITEM *));
+    /* Allocate memory for array of pointers to ITEM, zero-initialising everything so the last item is NULL */
+    items = calloc(option_count + 1, sizeof(ITEM *));
+    /* ---------------------------------------------------------------------------------------------------- */
 
     /* Create menu items based on options array */
     for (i; i < option_count; ++i) {
-        items[i] = new_item(options[i], options[i]);    // Add items here
+        items[i] = new_item(options[i], "");
     }
-    items[option_count] = (ITEM *)NULL;                 // Terminate option list with null pointer
+    items[option_count] = (ITEM *)NULL; // Terminate option list with null pointer
     /* ---------------------------------------- */
 
     power_menu = new_menu(items);     // Create power menu
     post_menu(power_menu);            // Display power menu
-    
+
     refresh();                                  
 
     /* Handle input here */
-    while (true) {
-    input = getch();
-    if (input == KEY_UP) {
-        menu_driver(power_menu, REQ_UP_ITEM);
-        break;
-    } else if (input == KEY_DOWN) {
-        menu_driver(power_menu, REQ_DOWN_ITEM);
-        break;
+    while ((input = getch()) != KEY_F(1)) {
+        if (input == KEY_UP) {
+            menu_driver(power_menu, REQ_UP_ITEM);
+        } else if (input == KEY_DOWN) {
+            menu_driver(power_menu, REQ_DOWN_ITEM);
+        }
     }
-    }
+    /* ----------------- */
 
-    /* ----------- */
-    
+    /* Free memory used by menu */
+    free_item(items[0]);
+    free_item(items[1]);
+    free_menu(power_menu);
+    /* ------------------------ */
+
     endwin();   // End curses mode
     return 0;
 }
@@ -66,4 +72,4 @@ int main() {
  * 3. Allow user to select an option
  * 4. Handle selected option appropriately
  * 5. Allow for some sort of customisation
-*/
+ */
