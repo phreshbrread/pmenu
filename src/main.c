@@ -18,6 +18,7 @@ int option_count = sizeof(options) / sizeof(char *);    // Determine number of a
 int main() {
     /* Declare menu variables */
     MENU *power_menu;
+    ITEM *selected_option;
     ITEM **items;
     /* ---------------------- */
 
@@ -44,12 +45,14 @@ int main() {
 
     refresh();                                  
 
-    /* Handle input here */
-    while ((input = getch()) != KEY_F(1)) {
+    /* Handle input */
+    while ((input = getch())) {
         if (input == KEY_UP) {
             menu_driver(power_menu, REQ_UP_ITEM);
         } else if (input == KEY_DOWN) {
             menu_driver(power_menu, REQ_DOWN_ITEM);
+        } else if (input == '\n' | input == '\r' | input == KEY_ENTER) {
+            break;
         }
     }
     /* ----------------- */
