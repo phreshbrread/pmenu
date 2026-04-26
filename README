@@ -1,10 +1,9 @@
 pmenu
 =====
 
-Attempt at a simple TUI-based power option menu
-
-Created to learn more about C
+TUI-based power menu written in C.
+Supports Linux and BSD systems.
 
 Dependencies
 ------------
-- ncurses
+    - ncurses
