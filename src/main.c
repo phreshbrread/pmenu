@@ -20,6 +20,7 @@ int main() {
     MENU *power_menu;
     ITEM *selected_option;
     ITEM **items;
+    int selected_option_index = 0;
     /* ---------------------- */
 
     /* Start curses mode, disable line buffering, disable character echo and enable special keys */
@@ -52,9 +53,24 @@ int main() {
         } else if (input == KEY_DOWN | input == 'j') {
             menu_driver(power_menu, REQ_DOWN_ITEM);
         } else if (input == KEY_ENTER | input == '\n' | input == '\r') {
+            selected_option_index = item_index(current_item(power_menu)); // Get the index of the current option
+            break;
         }
     }
     /* ------------ */
+
+    /* Determine action based on selected option */
+    switch (selected_option_index) {
+        case 0: // Shutdown
+            break;
+        case 1: // Reboot
+            break;
+        case 2: // Suspend
+            break;
+        case 3: // Cancel
+            break;
+    }
+    /* ----------------------------------------- */
 
     /* Free memory used by menu */
     free_item(items[0]);
