@@ -59,15 +59,22 @@ int main() {
                 menu_driver(power_menu, REQ_DOWN_ITEM);
                 break;
             case 27: // 27 is the raw value of ESC since there is no ncurses macro
-                return 0;
+                // TODO handle properly
+                break;
         }
     }
     /* ------------ */
 
     selected_option_index = item_index(current_item(power_menu)); // Get the index of the current option
-    
-    endwin();   // End curses mode
-    
+
+    /* Free memory and end curses mode */
+    for (i = 0; i < (option_count + 1); ++i) {
+        free_item(items[i]);
+    }
+    free_menu(power_menu);
+    endwin();
+    /* ------------------------------- */
+
     /* Determine action based on selected option */
     // TODO implement actual power commands
     switch (selected_option_index) {
@@ -87,18 +94,11 @@ int main() {
     }
     /* ----------------------------------------- */
 
-    /* Free memory used by menu */
-    free_item(items[0]);
-    free_item(items[1]);
-    free_menu(power_menu);
-    /* ------------------------ */
-
     return 0;
 }
 
-/* TODO:
+/* Extra TODO:
  * - Create new terminal when run
  *   - (Might not be necessary)
- * - Handle selected menu entry
  * - Center menu options correctly
  * - Allow for configuration options */
