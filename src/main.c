@@ -4,7 +4,7 @@
 #include <menu.h>
 
 /* Declare variables */
-int selected_option_index   = 0;
+int selected_option_index   = 3; // 3 is the index for cancel
 int startx                  = 0;
 int starty                  = 0;
 int rows                    = 0;
@@ -19,27 +19,27 @@ int option_count = sizeof(options) / sizeof(char *);    // Determine number of a
 int main() {
     /* Declare menu variables */
     MENU *power_menu;
-    ITEM *selected_option;
     ITEM **items;
     /* ---------------------- */
 
-    /* Start curses mode, disable line buffering, disable character echo and enable special keys */
+    /* Initialise ncurses */
+    set_escdelay(50); // Set delay for escape key
     initscr();
     cbreak();
     noecho(); 
     keypad(stdscr, TRUE); 
-    /* ----------------------------------------------------------------------------------------- */
+    /* ------------------ */
 
-    /* Allocate memory for array of pointers to ITEM, zero-initialising everything so the last item is NULL */
+    // Allocate memory for array of pointers to ITEM,
+    // zero-initialising everything so the last item is NULL
     items = calloc(option_count + 1, sizeof(ITEM *));
-    /* ---------------------------------------------------------------------------------------------------- */
 
-    /* Create menu items based on options array */
+    /* Create menu items from options array */
     for (i; i < option_count; ++i) {
         items[i] = new_item(options[i], "");
     }
     items[option_count] = (ITEM *)NULL; // Terminate option list with null pointer
-    /* ---------------------------------------- */
+    /* ------------------------------------ */
 
     power_menu = new_menu(items);     // Create menu based off items
     post_menu(power_menu);            // Display power menu
@@ -47,7 +47,8 @@ int main() {
     refresh();                                  
 
     /* Handle input */
-    while ((input = getch())){
+    // TODO handle '\r' and KEY_ENTER as well
+    while ((input = getch()) != '\n') {
         switch (input) {
             case KEY_UP:
             case'k':
@@ -57,29 +58,34 @@ int main() {
             case'j':
                 menu_driver(power_menu, REQ_DOWN_ITEM);
                 break;
-            case KEY_ENTER:
-            case '\n':
-            case '\r':
-                selected_option_index = item_index(current_item(power_menu)); // Get the index of the current option
-                mvprintw(6, 6, "%i", selected_option_index);
-                break;
+            case 27: // 27 is the raw value of ESC since there is no ncurses macro
+                return 0;
         }
     }
     /* ------------ */
 
+    selected_option_index = item_index(current_item(power_menu)); // Get the index of the current option
+    
+    endwin();   // End curses mode
+    
     /* Determine action based on selected option */
+    // TODO implement actual power commands
     switch (selected_option_index) {
         case 0: // Shutdown
+            printf("Shutting down...\n");
+            //system("shutdown -P now");
             break;
         case 1: // Reboot
+            printf("Rebooting...\n");
             break;
         case 2: // Suspend
+            printf("Suspending...\n");
             break;
         case 3: // Cancel
+            printf("Cancelled.\n");
             break;
     }
     /* ----------------------------------------- */
-
 
     /* Free memory used by menu */
     free_item(items[0]);
@@ -87,7 +93,6 @@ int main() {
     free_menu(power_menu);
     /* ------------------------ */
 
-    endwin();   // End curses mode
     return 0;
 }
 
