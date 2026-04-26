@@ -4,12 +4,13 @@
 #include <menu.h>
 
 /* Declare variables */
-int startx  = 0;
-int starty  = 0;
-int rows    = 0;
-int cols    = 0;
-int input   = 0;
-int i       = 0;
+int selected_option_index   = 0;
+int startx                  = 0;
+int starty                  = 0;
+int rows                    = 0;
+int cols                    = 0;
+int input                   = 0;
+int i                       = 0;
 
 char *options[] = { "Shutdown", "Reboot", "Suspend", "Cancel" };
 int option_count = sizeof(options) / sizeof(char *);    // Determine number of array entries
@@ -20,7 +21,6 @@ int main() {
     MENU *power_menu;
     ITEM *selected_option;
     ITEM **items;
-    int selected_option_index = 0;
     /* ---------------------- */
 
     /* Start curses mode, disable line buffering, disable character echo and enable special keys */
@@ -47,14 +47,22 @@ int main() {
     refresh();                                  
 
     /* Handle input */
-    while ((input = getch())) {
-        if (input == KEY_UP | input == 'k') {
-            menu_driver(power_menu, REQ_UP_ITEM);
-        } else if (input == KEY_DOWN | input == 'j') {
-            menu_driver(power_menu, REQ_DOWN_ITEM);
-        } else if (input == KEY_ENTER | input == '\n' | input == '\r') {
-            selected_option_index = item_index(current_item(power_menu)); // Get the index of the current option
-            break;
+    while ((input = getch())){
+        switch (input) {
+            case KEY_UP:
+            case'k':
+                menu_driver(power_menu, REQ_UP_ITEM);
+                break;
+            case KEY_DOWN:
+            case'j':
+                menu_driver(power_menu, REQ_DOWN_ITEM);
+                break;
+            case KEY_ENTER:
+            case '\n':
+            case '\r':
+                selected_option_index = item_index(current_item(power_menu)); // Get the index of the current option
+                mvprintw(6, 6, "%i", selected_option_index);
+                break;
         }
     }
     /* ------------ */
@@ -71,6 +79,7 @@ int main() {
             break;
     }
     /* ----------------------------------------- */
+
 
     /* Free memory used by menu */
     free_item(items[0]);
