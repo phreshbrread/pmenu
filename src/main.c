@@ -87,6 +87,7 @@ int main(int argc, char *argv[]) {
 #if defined(__linux__)
             char *args[] = { "shutdown", "-P", "now", NULL };
             execvp("shutdown", args);
+#endif
 
 
             break;
@@ -97,7 +98,7 @@ int main(int argc, char *argv[]) {
         case 2: // Suspend
             printf("Suspending...\n");
 
-#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD)
+#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD)
             system("zzz");
 #endif
             break;
