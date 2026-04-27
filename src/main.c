@@ -93,22 +93,25 @@ int main(int argc, char *argv[]) {
             printf("Shutting down...\n");
 
 #if defined(PLATFORM_LINUX)
-            char *args[] = { "shutdown", "-P", "now", NULL };
-            execvp("shutdown", args);
+            system("shutdown -P now");
 #elif defined(PLATFORM_BSD)
             system("shutdown -p now");
 #endif
-
-
             break;
         case 1: // Reboot
             printf("Rebooting...\n");
-
+            system("shutdown -r now");      // Works for both Linux and BSD
             break;
         case 2: // Suspend
             printf("Suspending...\n");
-
-#if defined(PLATFORM_BSD)
+#if defined(PLATFORM_LINUX)
+            // Try multiple ways of suspending
+            // TODO check for success so all three commands aren't run,
+            // this can likely be done with a loop & break
+            system("systemctl suspend");    // systemd
+            system("loginctl suspend");     // elogind
+            system("pm-suspend");           // pm-utils
+#elif defined(PLATFORM_BSD)
             system("zzz");
 #endif
             break;
@@ -122,6 +125,7 @@ int main(int argc, char *argv[]) {
 }
 
 /* Extra TODO:
+ * - Add Windows support (because why not?)
  * - Create new terminal when run
  *   - (Might not be necessary)
  * - Center menu options correctly
