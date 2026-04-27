@@ -86,7 +86,6 @@ int main(int argc, char *argv[]) {
     /* ------------------------------- */
 
     /* Determine action based on selected option */
-    // TODO implement actual power commands
     // TODO use execvp() instead of system()
     switch (selected_option_index) {
         case 0: // Shutdown
