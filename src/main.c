@@ -62,11 +62,13 @@ int main(int argc, char *argv[]) {
         switch (input) {
             case KEY_UP:
             case'k':
-                menu_driver(power_menu, REQ_UP_ITEM);
+            case 'h':
+                menu_driver(power_menu, REQ_PREV_ITEM);
                 break;
             case KEY_DOWN:
             case'j':
-                menu_driver(power_menu, REQ_DOWN_ITEM);
+            case 'l':
+                menu_driver(power_menu, REQ_NEXT_ITEM);
                 break;
             case 27:        // 27 is the raw value of ESC since there is no KEY macro
                 return 0;   // TODO handle properly
@@ -78,10 +80,10 @@ int main(int argc, char *argv[]) {
     selected_option_index = item_index(current_item(power_menu)); // Get the index of the current option
 
     /* Free memory and end curses mode */
+    free_menu(power_menu);
     for (i = 0; i < (option_count + 1); ++i) {
         free_item(items[i]);
     }
-    free_menu(power_menu);
     endwin();
     /* ------------------------------- */
 
@@ -124,6 +126,7 @@ int main(int argc, char *argv[]) {
 }
 
 /* Extra TODO:
+ * - Enable mouse usage
  * - Add Windows support (because why not?)
  * - Create new terminal when run
  *   - (Might not be necessary)
