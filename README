@@ -1,7 +1,7 @@
 pmenu
 =====
 
-TUI-based power menu written in C for Linux and BSD systems
+TUI-based power menu written in C for Linux and BSD systems.
 Handles shutting down, rebooting and suspending.
 
 Dependencies
