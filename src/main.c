@@ -16,7 +16,7 @@ char *options[] = { "Shutdown", "Reboot", "Suspend", "Cancel" };
 int option_count = sizeof(options) / sizeof(char *);    // Determine number of array entries
 /* -------------------------------------------------------------------------- */
 
-int main() {
+int main(int argc, char *argv[]) {
     /* Declare menu variables */
     MENU *power_menu;
     ITEM **items;
@@ -41,8 +41,9 @@ int main() {
     items[option_count] = (ITEM *)NULL; // Terminate option list with null pointer
     /* ------------------------------------ */
 
-    power_menu = new_menu(items);     // Create menu based off items
-    post_menu(power_menu);            // Display power menu
+    power_menu = new_menu((ITEM **)items);  // Create menu based off items
+    set_menu_mark(power_menu, ">");         // Set menu marker
+    post_menu(power_menu);                  // Display power menu
 
     refresh();                                  
 
@@ -58,8 +59,8 @@ int main() {
             case'j':
                 menu_driver(power_menu, REQ_DOWN_ITEM);
                 break;
-            case 27: // 27 is the raw value of ESC since there is no ncurses macro
-                // TODO handle properly
+            case 27:        // 27 is the raw value of ESC since there is no KEY macro
+                return 0;   // TODO handle properly
                 break;
         }
     }
