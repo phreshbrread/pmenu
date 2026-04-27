@@ -51,6 +51,7 @@ int main(int argc, char *argv[]) {
     /* ------------------------------------ */
 
     power_menu = new_menu((ITEM **)items);  // Create menu based off items
+    menu_opts_off(power_menu, O_NONCYCLIC); // Force enable menu wrapping
     set_menu_mark(power_menu, ">");         // Set menu marker
     post_menu(power_menu);                  // Display power menu
 
@@ -80,6 +81,7 @@ int main(int argc, char *argv[]) {
     selected_option_index = item_index(current_item(power_menu)); // Get the index of the current option
 
     /* Free memory and end curses mode */
+    unpost_menu(power_menu);
     free_menu(power_menu);
     for (i = 0; i < (option_count + 1); ++i) {
         free_item(items[i]);
