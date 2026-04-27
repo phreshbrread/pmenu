@@ -4,6 +4,14 @@
 #include <ncurses.h>
 #include <menu.h>
 
+/* Determine platform at compilation */
+#if defined(__linux__)
+#define PLATFORM_LINUX
+#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD)
+#define PLATFORM_BSD
+#endif
+/* --------------------------------- */
+
 /* Declare variables */
 int selected_option_index   = 3; // 3 is the index for cancel
 int startx                  = 0;
@@ -84,9 +92,11 @@ int main(int argc, char *argv[]) {
         case 0: // Shutdown
             printf("Shutting down...\n");
 
-#if defined(__linux__)
+#if defined(PLATFORM_LINUX)
             char *args[] = { "shutdown", "-P", "now", NULL };
             execvp("shutdown", args);
+#elif defined(PLATFORM_BSD)
+            system("shutdown -p now");
 #endif
 
 
@@ -98,7 +108,7 @@ int main(int argc, char *argv[]) {
         case 2: // Suspend
             printf("Suspending...\n");
 
-#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD)
+#if defined(PLATFORM_BSD)
             system("zzz");
 #endif
             break;
