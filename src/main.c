@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <ncurses.h>
 #include <menu.h>
 
@@ -78,13 +79,23 @@ int main(int argc, char *argv[]) {
 
     /* Determine action based on selected option */
     // TODO implement actual power commands
+    // TODO use execvp() instead of system()
     switch (selected_option_index) {
         case 0: // Shutdown
             printf("Shutting down...\n");
-            //system("shutdown -P now");
+
+#if defined(__linux__)
+            char *args[] = { "shutdown", "-P", "now", NULL };
+            execvp("shutdown", args);
+#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD)
+            system("zzz");
+#endif
+
+
             break;
         case 1: // Reboot
             printf("Rebooting...\n");
+
             break;
         case 2: // Suspend
             printf("Suspending...\n");
