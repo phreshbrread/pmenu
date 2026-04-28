@@ -1,3 +1,5 @@
+// TODO add "Usage" section to README
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
