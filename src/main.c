@@ -89,11 +89,13 @@ int main(int argc, char *argv[]) {
                 enter_pressed = true;
                 break;
             case KEY_UP:
+            case KEY_LEFT:
             case 'k':
             case 'h':
                 menu_driver(power_menu, REQ_PREV_ITEM);
                 break;
             case KEY_DOWN:
+            case KEY_RIGHT:
             case 'j':
             case 'l':
                 menu_driver(power_menu, REQ_NEXT_ITEM);
