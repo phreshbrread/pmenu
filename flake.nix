@@ -9,6 +9,7 @@
       pkgs = nixpkgs.legacyPackages.${system};
     in {
       devShells.${system}.default = pkgs.mkShell {
+        # Tools for use in dev shell
         buildInputs = with pkgs; [
           gcc
           ncurses
@@ -23,7 +24,9 @@
             src = ./.;
 
             # Needed during build phase
-            nativeBuildInputs = with pkgs; [];
+            nativeBuildInputs = with pkgs; [
+              gcc # Included in stdenv anyways
+            ];
 
             # Needed during runtime
             buildInputs = with pkgs; [
