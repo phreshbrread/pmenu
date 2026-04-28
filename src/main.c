@@ -52,6 +52,11 @@ int main(int argc, char *argv[]) {
     items[option_count] = (ITEM *)NULL; // Terminate option list with null pointer
     /* ------------------------------------ */
 
+    // TODO Center the menu
+    /* Move menu to the middle of the terminal */
+    /* --------------------------------------- */
+
+    // TODO Add a border around the menu
     power_menu = new_menu((ITEM **)items);  // Create menu based off items
     menu_opts_off(power_menu, O_NONCYCLIC); // Force enable menu wrapping
     set_menu_mark(power_menu, ">");         // Set menu marker
@@ -132,7 +137,5 @@ int main(int argc, char *argv[]) {
 /* Extra TODO:
  * - Enable mouse usage
  * - Add Windows support (because why not?)
- * - Create new terminal when run
- *   - (Might not be necessary)
  * - Center menu options correctly
  * - Allow for configuration options */
