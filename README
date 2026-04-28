@@ -8,13 +8,21 @@ Dependencies
 ------------
     - ncurses
 
+Usage example
+-------------
+I have a Hyprland keybind to run the following:
+    "$powerMenu = alacritty -o font.size=16 -T pmenu -e pmenu"
+This will open up Alacritty, run pmenu and give the window an according title, so that it can be automatically floated with a windowrule.
+
 Building
 ========
 
-With 'nix' (recommended)
+With nix (recommended)
 ------------------------
 Simply run 'nix build' or 'nix run' to build according to the included flake.nix
+This Github repo can also be added as a custom nix package, which is what I've done in my own config.
 
-Manual build with gcc
----------------------
-Run 'gcc --std=c99 -lmenu -lncurses -ltinfo ./src/main.c -o pmenu'
+Manual build
+------------
+While meant to be built with gcc, other c compilers should work just fine since this is such a simple program.
+The current build command is 'gcc --std=c99 -lmenu -lncurses -ltinfo ./src/main.c -o pmenu'
