@@ -7,3 +7,14 @@ Handles shutting down, rebooting and suspending.
 Dependencies
 ------------
     - ncurses
+
+Building
+========
+
+With 'nix' (recommended)
+------------------------
+Simply run 'nix build' or 'nix run' to build according to the included flake.nix
+
+Manual build with gcc
+---------------------
+Run 'gcc --std=c99 -lmenu -lncurses -ltinfo ./src/main.c -o pmenu'
