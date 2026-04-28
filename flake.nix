@@ -1,5 +1,5 @@
 {
-  description = "Example flake with a devShell";
+  description = "pmenu dev flake";
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
 
