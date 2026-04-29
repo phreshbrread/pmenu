@@ -136,16 +136,6 @@ int main(int argc, char *argv[]) {
         case 2: // Suspend
             printf("Suspending...\n");
 #if defined(PLATFORM_LINUX)
-
-            /*
-            // Try multiple ways of suspending
-            // TODO check for success so all three commands aren't run,
-            // this can likely be done with a loop & break
-            system("systemctl suspend");    // systemd
-            system("loginctl suspend");     // elogind
-            system("pm-suspend");           // pm-utils
-            */             
-
             /* Try several ways of suspending */
             if (system("systemctl suspend > /dev/null 2>&1") == 0) {
                 return 0;
@@ -157,14 +147,13 @@ int main(int argc, char *argv[]) {
                 printf("Suspend not supported\n");
             }
             /* ------------------------------ */
-
 #elif defined(PLATFORM_BSD)
             system("zzz");
 #endif
             break;
         case 3: // Cancel
             printf("Cancelled.\n");
-            break;
+            return 0;
     }
     /* --------------------------- */
 
