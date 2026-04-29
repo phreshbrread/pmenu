@@ -56,10 +56,7 @@ int main(int argc, char *argv[]) {
     keypad(stdscr, TRUE);
     /* ------------------ */
 
-    // TODO Center the menu
-    /* Move menu to the middle of the terminal */
-    /* --------------------------------------- */
-
+    // TODO Allow for mouse usage
     // Set up mouse handling
     mousemask(BUTTON1_RELEASED, NULL);  // Left click release
 
@@ -74,30 +71,24 @@ int main(int argc, char *argv[]) {
     items[option_count] = (ITEM *)NULL; // Terminate option list with null pointer
     /* ------------------------------------ */
 
-    // TODO Allow for mouse usage
-    power_menu = new_menu((ITEM **)items);  // Create menu based off items
-    menu_opts_off(power_menu, O_NONCYCLIC); // Force enable menu wrapping
-    set_menu_mark(power_menu, ">");         // Set menu marker
-
-
     /* Create window for menu */
+    power_menu = new_menu((ITEM **)items);                              // Create menu based off items
+    menu_opts_off(power_menu, O_NONCYCLIC);                             // Force enable menu wrapping
+    set_menu_mark(power_menu, ">");                                     // Set menu marker
     getmaxyx(stdscr, max_y, max_x);                                     // Get size of terminal window
     menu_window = newwin(max_y / 2, max_x / 2, max_y / 4, max_x / 4);   // Create a window in the middle of the terminal
     keypad(menu_window, TRUE);
     box(menu_window, 0, 0);
     /* ---------------------- */
 
-    getmaxyx(menu_window, sub_max_y, sub_max_x);
-    set_menu_win(power_menu, menu_window);  // Assign power menu to the main menu window
+    getmaxyx(menu_window, sub_max_y, sub_max_x);    // Get size of main menu window
+    set_menu_win(power_menu, menu_window);          // Assign power menu to the main menu window
 
-    menu_subwin = derwin(menu_window, sub_max_y / 2, sub_max_x / 2, sub_max_y / 2 - option_count / 2, sub_max_x / 2 - strlen(options[0]) / 2);
+    // Create derived window in the middle of the main window
+    menu_subwin = derwin(menu_window, sub_max_y / 2, sub_max_x / 2, sub_max_y / 2 - option_count / 2, sub_max_x / 2 - strlen(options[0]) / 2 - 1);
 
-    set_menu_sub(power_menu, menu_subwin);
-
-    refresh();                                  
-    wrefresh(menu_window);
-
-    post_menu(power_menu);                  // Display power menu
+    set_menu_sub(power_menu, menu_subwin);          // Set power menu subwindow
+    post_menu(power_menu);                          // Display power menu
 
     /* Handle input */
     while (input = wgetch(menu_window)) {
