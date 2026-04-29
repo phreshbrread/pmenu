@@ -1,5 +1,3 @@
-// TODO add "Usage" section to README
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -14,7 +12,7 @@
 #endif
 /* --------------------------------- */
 
-/* Declare variables */
+/* Declare global variables */
 int selected_option_index   = 3; // 3 is the index for cancel
 int startx                  = 0;
 int starty                  = 0;
@@ -23,15 +21,29 @@ int cols                    = 0;
 int input                   = 0;
 int i                       = 0;
 
+bool enter_pressed          = false;
+
 char *options[] = { "Shutdown", "Reboot", "Suspend", "Cancel" };
 int option_count = sizeof(options) / sizeof(char *);    // Determine number of array entries
-/* -------------------------------------------------------------------------- */
+/* ------------------------ */
+
+/* Declare menu variables */
+ITEM **items;
+MENU *power_menu;
+MEVENT mouse_event;
+/* ---------------------- */
+
+/* Free up memory used by the menu */
+void unload_menu() {
+    unpost_menu(power_menu);
+    free_menu(power_menu);
+    for (i = 0; i < (option_count + 1); ++i) {
+        free_item(items[i]);
+    }
+}
+/* ------------------------------- */
 
 int main(int argc, char *argv[]) {
-    /* Declare menu variables */
-    MENU *power_menu;
-    ITEM **items;
-    /* ---------------------- */
 
     /* Initialise ncurses */
     set_escdelay(50); // Set delay for escape key
@@ -40,6 +52,9 @@ int main(int argc, char *argv[]) {
     noecho(); 
     keypad(stdscr, TRUE); 
     /* ------------------ */
+
+    // Set up mouse handling
+    mousemask(BUTTON1_RELEASED, NULL);  // Left click release
 
     // Allocate memory for array of pointers to ITEM,
     // zero-initialising everything so the last item is NULL
@@ -52,6 +67,12 @@ int main(int argc, char *argv[]) {
     items[option_count] = (ITEM *)NULL; // Terminate option list with null pointer
     /* ------------------------------------ */
 
+    // TODO Center the menu
+    /* Move menu to the middle of the terminal */
+    /* --------------------------------------- */
+
+    // TODO Add a border around the menu
+    // TODO Allow for mouse usage
     power_menu = new_menu((ITEM **)items);  // Create menu based off items
     menu_opts_off(power_menu, O_NONCYCLIC); // Force enable menu wrapping
     set_menu_mark(power_menu, ">");         // Set menu marker
@@ -60,39 +81,44 @@ int main(int argc, char *argv[]) {
     refresh();                                  
 
     /* Handle input */
-    // TODO handle '\r' and KEY_ENTER as well
-    while ((input = getch()) != '\n') {
+    while (input = getch()) {
         switch (input) {
+            case '\n':
+            case '\r':
+            case KEY_ENTER:
+                enter_pressed = true;
+                break;
             case KEY_UP:
-            case'k':
+            case KEY_LEFT:
+            case 'k':
             case 'h':
                 menu_driver(power_menu, REQ_PREV_ITEM);
                 break;
             case KEY_DOWN:
-            case'j':
+            case KEY_RIGHT:
+            case 'j':
             case 'l':
                 menu_driver(power_menu, REQ_NEXT_ITEM);
                 break;
-            case 27:        // 27 is the raw value of ESC since there is no KEY macro
-                return 0;   // TODO handle properly
-                break;
+            case 27: // 27 is the raw value of ESC since there is no KEY macro
+                unload_menu();
+                endwin();
+                printf("Cancelled.\n");
+                return 0;
         }
+
+        if (enter_pressed) { break; } // Break free of while loop
     }
     /* ------------ */
 
     selected_option_index = item_index(current_item(power_menu)); // Get the index of the current option
 
-    /* Free memory and end curses mode */
-    unpost_menu(power_menu);
-    free_menu(power_menu);
-    for (i = 0; i < (option_count + 1); ++i) {
-        free_item(items[i]);
-    }
+    unload_menu();
     endwin();
-    /* ------------------------------- */
 
-    /* Determine action based on selected option */
-    // TODO use execvp() instead of system()
+    // TODO Add confirmation dialogue
+
+    /* Handle selected menu option */
     switch (selected_option_index) {
         case 0: // Shutdown
             printf("Shutting down...\n");
@@ -110,29 +136,31 @@ int main(int argc, char *argv[]) {
         case 2: // Suspend
             printf("Suspending...\n");
 #if defined(PLATFORM_LINUX)
-            // Try multiple ways of suspending
-            // TODO check for success so all three commands aren't run,
-            // this can likely be done with a loop & break
-            system("systemctl suspend");    // systemd
-            system("loginctl suspend");     // elogind
-            system("pm-suspend");           // pm-utils
+            /* Try several ways of suspending */
+            if (system("systemctl suspend > /dev/null 2>&1") == 0) {
+                return 0;
+            } else if (system("loginctl suspend > /dev/null 2>&1") == 0) {
+                return 0;
+            } else if (system("pm-suspend > /dev/null 2>&1") == 0) {
+                return 0;
+            } else {
+                printf("Suspend not supported\n");
+            }
+            /* ------------------------------ */
 #elif defined(PLATFORM_BSD)
             system("zzz");
 #endif
             break;
         case 3: // Cancel
             printf("Cancelled.\n");
-            break;
+            return 0;
     }
-    /* ----------------------------------------- */
+    /* --------------------------- */
 
     return 0;
 }
 
 /* Extra TODO:
- * - Enable mouse usage
- * - Add Windows support (because why not?)
- * - Create new terminal when run
- *   - (Might not be necessary)
- * - Center menu options correctly
+ * - Add Windows support
+ * - Potentially use execvp() instead of system()
  * - Allow for configuration options */
