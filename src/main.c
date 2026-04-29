@@ -148,11 +148,11 @@ int main(int argc, char *argv[]) {
 
             /* Try several ways of suspending */
             if (system("systemctl suspend > /dev/null 2>&1") == 0) {
-                break;
+                return 0;
             } else if (system("loginctl suspend > /dev/null 2>&1") == 0) {
-                break;
+                return 0;
             } else if (system("pm-suspend > /dev/null 2>&1") == 0) {
-                break;
+                return 0;
             } else {
                 printf("Suspend not supported\n");
             }
