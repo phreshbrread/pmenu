@@ -1,5 +1,3 @@
-// TODO add "Usage" section to README
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -14,7 +12,7 @@
 #endif
 /* --------------------------------- */
 
-/* Declare variables */
+/* Declare global variables */
 int selected_option_index   = 3; // 3 is the index for cancel
 int startx                  = 0;
 int starty                  = 0;
@@ -27,7 +25,7 @@ bool enter_pressed          = false;
 
 char *options[] = { "Shutdown", "Reboot", "Suspend", "Cancel" };
 int option_count = sizeof(options) / sizeof(char *);    // Determine number of array entries
-/* -------------------------------------------------------------------------- */
+/* ------------------------ */
 
 /* Declare menu variables */
 ITEM **items;
@@ -35,6 +33,7 @@ MENU *power_menu;
 MEVENT mouse_event;
 /* ---------------------- */
 
+/* Free up memory used by the menu */
 void unload_menu() {
     unpost_menu(power_menu);
     free_menu(power_menu);
@@ -42,6 +41,7 @@ void unload_menu() {
         free_item(items[i]);
     }
 }
+/* ------------------------------- */
 
 int main(int argc, char *argv[]) {
 
@@ -103,6 +103,7 @@ int main(int argc, char *argv[]) {
             case 27: // 27 is the raw value of ESC since there is no KEY macro
                 unload_menu();
                 endwin();
+                printf("Cancelled.\n");
                 return 0;
         }
 
@@ -112,13 +113,12 @@ int main(int argc, char *argv[]) {
 
     selected_option_index = item_index(current_item(power_menu)); // Get the index of the current option
 
-    /* Free memory and end curses mode */
     unload_menu();
     endwin();
-    /* ------------------------------- */
 
-    /* Determine action based on selected option */
-    // TODO use execvp() instead of system()
+    // TODO Add confirmation dialogue
+
+    /* Handle selected menu option */
     switch (selected_option_index) {
         case 0: // Shutdown
             printf("Shutting down...\n");
@@ -136,12 +136,28 @@ int main(int argc, char *argv[]) {
         case 2: // Suspend
             printf("Suspending...\n");
 #if defined(PLATFORM_LINUX)
+
+            /*
             // Try multiple ways of suspending
             // TODO check for success so all three commands aren't run,
             // this can likely be done with a loop & break
             system("systemctl suspend");    // systemd
             system("loginctl suspend");     // elogind
             system("pm-suspend");           // pm-utils
+            */             
+
+            /* Try several ways of suspending */
+            if (system("systemctl suspend > /dev/null 2>&1") == 0) {
+                break;
+            } else if (system("loginctl suspend > /dev/null 2>&1") == 0) {
+                break;
+            } else if (system("pm-suspend > /dev/null 2>&1") == 0) {
+                break;
+            } else {
+                printf("Suspend not supported\n");
+            }
+            /* ------------------------------ */
+
 #elif defined(PLATFORM_BSD)
             system("zzz");
 #endif
@@ -150,12 +166,12 @@ int main(int argc, char *argv[]) {
             printf("Cancelled.\n");
             break;
     }
-    /* ----------------------------------------- */
+    /* --------------------------- */
 
     return 0;
 }
 
 /* Extra TODO:
- * - Add Windows support (because why not?)
- * - Center menu options correctly
+ * - Add Windows support
+ * - Potentially use execvp() instead of system()
  * - Allow for configuration options */
