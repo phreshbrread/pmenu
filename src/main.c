@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <ncurses.h>
 #include <menu.h>
@@ -14,12 +15,12 @@
 
 /* Declare global variables */
 int selected_option_index   = 3; // 3 is the index for cancel
-int startx                  = 0;
-int starty                  = 0;
-int rows                    = 0;
-int cols                    = 0;
 int input                   = 0;
 int i                       = 0;
+int max_x                   = 0;
+int max_y                   = 0;
+int sub_max_x               = 0;
+int sub_max_y               = 0;
 
 bool enter_pressed          = false;
 
@@ -31,6 +32,8 @@ int option_count = sizeof(options) / sizeof(char *);    // Determine number of a
 ITEM **items;
 MENU *power_menu;
 MEVENT mouse_event;
+WINDOW *menu_window;
+WINDOW *menu_subwin;
 /* ---------------------- */
 
 /* Free up memory used by the menu */
@@ -50,8 +53,12 @@ int main(int argc, char *argv[]) {
     initscr();
     cbreak();
     noecho(); 
-    keypad(stdscr, TRUE); 
+    keypad(stdscr, TRUE);
     /* ------------------ */
+
+    // TODO Center the menu
+    /* Move menu to the middle of the terminal */
+    /* --------------------------------------- */
 
     // Set up mouse handling
     mousemask(BUTTON1_RELEASED, NULL);  // Left click release
@@ -67,21 +74,33 @@ int main(int argc, char *argv[]) {
     items[option_count] = (ITEM *)NULL; // Terminate option list with null pointer
     /* ------------------------------------ */
 
-    // TODO Center the menu
-    /* Move menu to the middle of the terminal */
-    /* --------------------------------------- */
-
-    // TODO Add a border around the menu
     // TODO Allow for mouse usage
     power_menu = new_menu((ITEM **)items);  // Create menu based off items
     menu_opts_off(power_menu, O_NONCYCLIC); // Force enable menu wrapping
     set_menu_mark(power_menu, ">");         // Set menu marker
-    post_menu(power_menu);                  // Display power menu
+
+
+    /* Create window for menu */
+    getmaxyx(stdscr, max_y, max_x);                                     // Get size of terminal window
+    menu_window = newwin(max_y / 2, max_x / 2, max_y / 4, max_x / 4);   // Create a window in the middle of the terminal
+    keypad(menu_window, TRUE);
+    box(menu_window, 0, 0);
+    /* ---------------------- */
+
+    getmaxyx(menu_window, sub_max_y, sub_max_x);
+    set_menu_win(power_menu, menu_window);  // Assign power menu to the main menu window
+
+    menu_subwin = derwin(menu_window, sub_max_y / 2, sub_max_x / 2, sub_max_y / 2 - option_count / 2, sub_max_x / 2 - strlen(options[0]) / 2);
+
+    set_menu_sub(power_menu, menu_subwin);
 
     refresh();                                  
+    wrefresh(menu_window);
+
+    post_menu(power_menu);                  // Display power menu
 
     /* Handle input */
-    while (input = getch()) {
+    while (input = wgetch(menu_window)) {
         switch (input) {
             case '\n':
             case '\r':
