@@ -20,7 +20,7 @@
         packages.${system} = {
           pmenu = pkgs.stdenv.mkDerivation {
             pname = "pmenu";
-            version = "1.0.0";
+            version = "1.0.1";
             src = ./.;
 
             # Needed during build phase

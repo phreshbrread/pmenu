@@ -6,7 +6,7 @@
 #include <menu.h>
 
 // TODO Pull VERSION from flake.nix
-#define VERSION "1.0.0"
+#define VERSION "1.0.1"
 
 /* Determine platform at compilation */
 #if defined(__linux__)
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 
     /* Create menu items from options array */
     for (i; i < option_count; ++i) {
-        items[i] = new_item(options[i], "");
+        items[i] = new_item(options[i], options[i]);
     }
     items[option_count] = (ITEM *)NULL; // Terminate option list with null pointer
     /* ------------------------------------ */
@@ -69,6 +69,7 @@ int main(int argc, char *argv[]) {
     /* Create main window for menu */
     power_menu = new_menu((ITEM **)items);  // Create menu based off items
     menu_opts_off(power_menu, O_NONCYCLIC); // Force enable menu wrapping
+    menu_opts_off(power_menu, O_SHOWDESC); // Disable item descriptions
     set_menu_mark(power_menu, ">");         // Set menu marker
 
     // Create main menu window using size of power menu + padding
