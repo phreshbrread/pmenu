@@ -1,8 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <ncurses.h>
 #include <menu.h>
+
+// TODO Pull VERSION from flake.nix
+#define VERSION "1.0.0"
 
 /* Determine platform at compilation */
 #if defined(__linux__)
@@ -13,51 +17,46 @@
 /* --------------------------------- */
 
 /* Declare global variables */
-int selected_option_index   = 3; // 3 is the index for cancel
-int startx                  = 0;
-int starty                  = 0;
-int rows                    = 0;
-int cols                    = 0;
+int selected_option_index   = 3;    // Default to 3 for cancel
 int input                   = 0;
 int i                       = 0;
+int max_x                   = 0;
+int max_y                   = 0;
+int sub_max_x               = 0;
+int sub_max_y               = 0;
 
 bool enter_pressed          = false;
 
 char *options[] = { "Shutdown", "Reboot", "Suspend", "Cancel" };
 int option_count = sizeof(options) / sizeof(char *);    // Determine number of array entries
+int longest_option_char_count;
 /* ------------------------ */
 
 /* Declare menu variables */
 ITEM **items;
 MENU *power_menu;
 MEVENT mouse_event;
+WINDOW *menu_window;
+WINDOW *menu_subwin;
 /* ---------------------- */
 
-/* Free up memory used by the menu */
-void unload_menu() {
-    unpost_menu(power_menu);
-    free_menu(power_menu);
-    for (i = 0; i < (option_count + 1); ++i) {
-        free_item(items[i]);
-    }
-}
-/* ------------------------------- */
-
 int main(int argc, char *argv[]) {
+    // TODO Un-hardcode this
+    longest_option_char_count = strlen(options[0]); // Get length of longest menu option
 
     /* Initialise ncurses */
     set_escdelay(50); // Set delay for escape key
     initscr();
     cbreak();
-    noecho(); 
-    keypad(stdscr, TRUE); 
+    noecho();
+    keypad(stdscr, TRUE);
     /* ------------------ */
 
-    // Set up mouse handling
-    mousemask(BUTTON1_RELEASED, NULL);  // Left click release
+    getmaxyx(stdscr, max_y, max_x); // Get size of terminal window
 
-    // Allocate memory for array of pointers to ITEM,
-    // zero-initialising everything so the last item is NULL
+    // TODO Allow for mouse usage
+
+    // Allocate memory for array of pointers to ITEM, zero-initialising everything so the last item is NULL
     items = calloc(option_count + 1, sizeof(ITEM *));
 
     /* Create menu items from options array */
@@ -67,21 +66,30 @@ int main(int argc, char *argv[]) {
     items[option_count] = (ITEM *)NULL; // Terminate option list with null pointer
     /* ------------------------------------ */
 
-    // TODO Center the menu
-    /* Move menu to the middle of the terminal */
-    /* --------------------------------------- */
-
-    // TODO Add a border around the menu
-    // TODO Allow for mouse usage
+    /* Create main window for menu */
     power_menu = new_menu((ITEM **)items);  // Create menu based off items
     menu_opts_off(power_menu, O_NONCYCLIC); // Force enable menu wrapping
     set_menu_mark(power_menu, ">");         // Set menu marker
-    post_menu(power_menu);                  // Display power menu
 
-    refresh();                                  
+    // Create main menu window using size of power menu + padding
+    menu_window = newwin(option_count + 4, longest_option_char_count + 10, max_y / 2 - option_count, max_x / 2 - longest_option_char_count);
+
+    keypad(menu_window, TRUE);
+    box(menu_window, 0, 0);
+    /* ---------------------- */
+
+    getmaxyx(menu_window, sub_max_y, sub_max_x);    // Get size of main menu window
+    set_menu_win(power_menu, menu_window);          // Assign power menu to the main menu window
+
+    // Create derived window in the middle of the main window
+    menu_subwin = derwin(menu_window, 0, 0, sub_max_y / 4, sub_max_x / 4);
+
+    mvwprintw(menu_window, 0, 2, "pmenu %s", VERSION);  // Window titlebar
+    set_menu_sub(power_menu, menu_subwin);              // Set power menu subwindow
+    post_menu(power_menu);                              // Display power menu
 
     /* Handle input */
-    while (input = getch()) {
+    while (input = wgetch(menu_window)) {
         switch (input) {
             case '\n':
             case '\r':
@@ -101,19 +109,16 @@ int main(int argc, char *argv[]) {
                 menu_driver(power_menu, REQ_NEXT_ITEM);
                 break;
             case 27: // 27 is the raw value of ESC since there is no KEY macro
-                unload_menu();
-                endwin();
                 printf("Cancelled.\n");
-                return 0;
+                goto cleanup;
         }
 
         if (enter_pressed) { break; } // Break free of while loop
     }
     /* ------------ */
 
-    selected_option_index = item_index(current_item(power_menu)); // Get the index of the current option
+    selected_option_index = item_index(current_item(power_menu));   // Get the index of the current option
 
-    unload_menu();
     endwin();
 
     // TODO Add confirmation dialogue
@@ -138,11 +143,11 @@ int main(int argc, char *argv[]) {
 #if defined(PLATFORM_LINUX)
             /* Try several ways of suspending */
             if (system("systemctl suspend > /dev/null 2>&1") == 0) {
-                return 0;
+                break;
             } else if (system("loginctl suspend > /dev/null 2>&1") == 0) {
-                return 0;
+                break;
             } else if (system("pm-suspend > /dev/null 2>&1") == 0) {
-                return 0;
+                break;
             } else {
                 printf("Suspend not supported\n");
             }
@@ -153,14 +158,29 @@ int main(int argc, char *argv[]) {
             break;
         case 3: // Cancel
             printf("Cancelled.\n");
-            return 0;
+            goto cleanup;
     }
     /* --------------------------- */
+
+
+    /* Free up memory used by the menu */
+cleanup:
+    unpost_menu(power_menu);
+    free_menu(power_menu);
+    for (i = 0; i < (option_count + 1); ++i) {
+        free_item(items[i]);
+    }
+    free(items);
+    delwin(menu_subwin);
+    delwin(menu_window);
+    endwin();
+    /* ------------------------------- */
 
     return 0;
 }
 
 /* Extra TODO:
+ * - Properly refresh window so resizing doesn't break it
  * - Add Windows support
  * - Potentially use execvp() instead of system()
  * - Allow for configuration options */
