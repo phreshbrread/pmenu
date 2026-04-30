@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
     set_escdelay(50); // Set delay for escape key
     initscr();
     cbreak();
-    noecho(); 
+    noecho();
     keypad(stdscr, TRUE);
     /* ------------------ */
 
@@ -139,11 +139,11 @@ int main(int argc, char *argv[]) {
 #if defined(PLATFORM_LINUX)
             /* Try several ways of suspending */
             if (system("systemctl suspend > /dev/null 2>&1") == 0) {
-                return 0;
+                break;
             } else if (system("loginctl suspend > /dev/null 2>&1") == 0) {
-                return 0;
+                break;
             } else if (system("pm-suspend > /dev/null 2>&1") == 0) {
-                return 0;
+                break;
             } else {
                 printf("Suspend not supported\n");
             }
