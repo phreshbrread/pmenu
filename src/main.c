@@ -6,7 +6,7 @@
 #include <menu.h>
 
 // TODO Pull VERSION from flake.nix
-#define VERSION "0.1.1"
+#define VERSION "1.0.0"
 
 /* Determine platform at compilation */
 #if defined(__linux__)
