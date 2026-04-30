@@ -29,6 +29,7 @@ bool enter_pressed          = false;
 
 char *options[] = { "Shutdown", "Reboot", "Suspend", "Cancel" };
 int option_count = sizeof(options) / sizeof(char *);    // Determine number of array entries
+int longest_option_char_count;
 /* ------------------------ */
 
 /* Declare menu variables */
@@ -40,6 +41,9 @@ WINDOW *menu_subwin;
 /* ---------------------- */
 
 int main(int argc, char *argv[]) {
+    // TODO Un-hardcode this
+    longest_option_char_count = strlen(options[0]); // Get length of longest menu option
+
     /* Initialise ncurses */
     set_escdelay(50); // Set delay for escape key
     initscr();
@@ -68,7 +72,7 @@ int main(int argc, char *argv[]) {
     set_menu_mark(power_menu, ">");         // Set menu marker
 
     // Create main menu window using size of power menu + padding
-    menu_window = newwin(option_count + 4, strlen(options[0]) + 10, max_y / 4, max_x / 4);
+    menu_window = newwin(option_count + 4, longest_option_char_count + 10, max_y / 2 - option_count, max_x / 2 - longest_option_char_count);
 
     keypad(menu_window, TRUE);
     box(menu_window, 0, 0);
@@ -176,6 +180,7 @@ cleanup:
 }
 
 /* Extra TODO:
+ * - Properly refresh window so resizing doesn't break it
  * - Add Windows support
  * - Potentially use execvp() instead of system()
  * - Allow for configuration options */
