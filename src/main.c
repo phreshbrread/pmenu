@@ -47,7 +47,6 @@ void unload_menu() {
 /* ------------------------------- */
 
 int main(int argc, char *argv[]) {
-
     /* Initialise ncurses */
     set_escdelay(50); // Set delay for escape key
     initscr();
@@ -76,7 +75,11 @@ int main(int argc, char *argv[]) {
     menu_opts_off(power_menu, O_NONCYCLIC);                             // Force enable menu wrapping
     set_menu_mark(power_menu, ">");                                     // Set menu marker
     getmaxyx(stdscr, max_y, max_x);                                     // Get size of terminal window
-    menu_window = newwin(max_y / 2, max_x / 2, max_y / 4, max_x / 4);   // Create a window in the middle of the terminal
+                                                                        //menu_window = newwin(max_y / 2, max_x / 2, max_y / 4, max_x / 4);   // Create a window in the middle of the terminal
+
+                                                                        // WINDOW *newwin(int nlines, int ncols, int begin_y, int begin_x);
+    menu_window = newwin(option_count + 4, strlen(options[0]) + 10, max_y / 4, max_x / 4);
+
     keypad(menu_window, TRUE);
     box(menu_window, 0, 0);
     /* ---------------------- */
@@ -85,7 +88,8 @@ int main(int argc, char *argv[]) {
     set_menu_win(power_menu, menu_window);          // Assign power menu to the main menu window
 
     // Create derived window in the middle of the main window
-    menu_subwin = derwin(menu_window, sub_max_y / 2, sub_max_x / 2, sub_max_y / 2 - option_count / 2, sub_max_x / 2 - strlen(options[0]) / 2 - 1);
+    menu_subwin = derwin(menu_window, 0, 0, sub_max_y / 4, sub_max_x / 4);
+   // box(menu_subwin, 0, 0);
 
     set_menu_sub(power_menu, menu_subwin);          // Set power menu subwindow
     post_menu(power_menu);                          // Display power menu
