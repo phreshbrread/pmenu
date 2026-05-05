@@ -5,9 +5,6 @@
 #include <ncurses.h>
 #include <menu.h>
 
-// TODO Pull VERSION from flake.nix
-#define VERSION "1.0.1"
-
 /* Determine platform at compilation */
 #if defined(__linux__)
 #define PLATFORM_LINUX
@@ -31,6 +28,12 @@ char *options[] = { "Shutdown", "Reboot", "Suspend", "Cancel" };
 int option_count = sizeof(options) / sizeof(char *);    // Determine number of array entries
 int longest_option_char_count;
 /* ------------------------ */
+
+/* Get version from file */
+const char version[] = {
+#include "version.txt"
+};
+/* --------------------- */
 
 /* Declare menu variables */
 ITEM **items;
@@ -85,7 +88,7 @@ int main(int argc, char *argv[]) {
     // Create derived window in the middle of the main window
     menu_subwin = derwin(menu_window, 0, 0, sub_max_y / 4, sub_max_x / 4);
 
-    mvwprintw(menu_window, 0, 2, "pmenu %s", VERSION);  // Window titlebar
+    mvwprintw(menu_window, 0, 2, "pmenu %s", version);  // Window titlebar
     set_menu_sub(power_menu, menu_subwin);              // Set power menu subwindow
     post_menu(power_menu);                              // Display power menu
 
