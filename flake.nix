@@ -7,7 +7,7 @@
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
-      pkgVersionFromFile = nixpkgs.lib.fileContents ./src/version.txt;
+      pkgVersionFromFile = builtins.replaceStrings ["\""] [""] (nixpkgs.lib.fileContents ./src/version.txt);
     in {
       devShells.${system}.default = pkgs.mkShell {
         # Tools for use in dev shell
