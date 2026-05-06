@@ -36,7 +36,7 @@
 
             # Build package
             buildPhase = ''
-              gcc -Wall -Wextra -Wpedantic -g --std=c99 -lmenu -lncurses -ltinfo ./src/main.c -o pmenu
+              gcc -Wall -Wextra -Wpedantic --std=c99 -lmenu -lncurses -ltinfo ./src/main.c -o pmenu
             '';
 
             # Install package
