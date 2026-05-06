@@ -7,6 +7,7 @@
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
+      pkgVersionFromFile = builtins.replaceStrings ["\""] [""] (nixpkgs.lib.fileContents ./src/version.txt);
     in {
       devShells.${system}.default = pkgs.mkShell {
         # Tools for use in dev shell
@@ -20,7 +21,7 @@
         packages.${system} = {
           pmenu = pkgs.stdenv.mkDerivation {
             pname = "pmenu";
-            version = "1.0.0";
+            version = "${pkgVersionFromFile}";
             src = ./.;
 
             # Needed during build phase
