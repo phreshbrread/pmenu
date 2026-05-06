@@ -44,8 +44,10 @@ WINDOW *menu_subwin;
 /* ---------------------- */
 
 int main(int argc, char *argv[]) {
+    /* Get length of longest option */
     // TODO Un-hardcode this
     longest_option_char_count = strlen(options[0]); // Get length of longest menu option
+    /* ---------------------------- */
 
     /* Initialise ncurses */
     set_escdelay(50); // Set delay for escape key
