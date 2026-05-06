@@ -133,6 +133,7 @@ int main(int argc, char *argv[]) {
             printf("Shutting down...\n");
 
 #if defined(PLATFORM_LINUX)
+            // TODO Try several different shutdown options since Gentoo and Guix use different commands
             system("shutdown -P now");
 #elif defined(PLATFORM_BSD)
             system("shutdown -p now");
@@ -186,5 +187,4 @@ cleanup:
 /* Extra TODO:
  * - Properly refresh window so resizing doesn't break it
  * - Add Windows support
- * - Potentially use execvp() instead of system()
  * - Allow for configuration options */
