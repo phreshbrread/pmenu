@@ -11,6 +11,8 @@ Simply run from a terminal.
 I recommend setting a keybind to open and execute at the same time.
 Example: "kitty -T pmenu -o font_size=16 pmenu"
 
+Run "pmenu --help" to view valid cmd arguments
+
 Install
 -------
 
