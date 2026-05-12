@@ -22,11 +22,11 @@ int max_y                   = 0;
 int sub_max_x               = 0;
 int sub_max_y               = 0;
 
-bool enter_pressed          = false;
+char *options[]                 = { "Shutdown", "Reboot", "Suspend", "Cancel" };
+int option_count                = sizeof(options) / sizeof(char *);
+int longest_option_char_count   = 0;
 
-char *options[] = { "Shutdown", "Reboot", "Suspend", "Cancel" };
-int option_count = sizeof(options) / sizeof(char *);    // Determine number of array entries
-int longest_option_char_count;
+bool enter_pressed = false;
 /* ------------------------ */
 
 /* Get version from file */
@@ -88,6 +88,7 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
     }
     /* ------------ */
 
+    enter_pressed = false; // Revert enter state
     return item_index(current_item(menu_to_interface_with)); // Return index of the selected option
 }
 
@@ -125,7 +126,7 @@ int main(int argc, char *argv[]) {
     menu_opts_off(power_menu, O_SHOWDESC); // Disable item descriptions
     set_menu_mark(power_menu, ">");         // Set menu marker
 
-    // Create main menu window using size of power menu + padding
+    // Create main menu window using size of menu + padding
     menu_window = newwin(option_count + 4, longest_option_char_count + 10, max_y / 2 - option_count, max_x / 2 - longest_option_char_count);
 
     keypad(menu_window, TRUE);
@@ -143,7 +144,6 @@ int main(int argc, char *argv[]) {
     post_menu(power_menu);                              // Display power menu
 
     selected_option_index = get_user_selection_index(menu_window, power_menu); // Handle input
-
 
     endwin();
 
