@@ -5,6 +5,11 @@
 #include <ncurses.h>
 #include <menu.h>
 
+/* Flags */
+bool TEST_MODE = false;
+/* ----- */
+
+
 /* Determine platform at compilation */
 #if defined(__linux__)
 #define PLATFORM_LINUX
@@ -93,6 +98,16 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
 }
 
 int main(int argc, char *argv[]) {
+
+    /* Handle args */
+    // Quick and dirty for now
+    // TODO improve
+    if (strstr(argv[1], "-t")) {
+        TEST_MODE = true;
+        printf("Testing mode enabled.\n");
+    }
+    /* ----------- */
+
     /* Get length of longest option */
     // TODO Un-hardcode this
     longest_option_char_count = strlen(options[0]); // Get length of longest menu option
@@ -153,6 +168,7 @@ int main(int argc, char *argv[]) {
     switch (selected_option_index) {
         case 0: // Shutdown
             printf("Shutting down...\n");
+            if (TEST_MODE) { return 0; }
 
 #if defined(PLATFORM_LINUX)
             // TODO Try several different shutdown options since Gentoo and Guix use different commands
@@ -163,10 +179,14 @@ int main(int argc, char *argv[]) {
             break;
         case 1: // Reboot
             printf("Rebooting...\n");
+            if (TEST_MODE) { return 0; }
+
             system("shutdown -r now");      // Works for both Linux and BSD
             break;
         case 2: // Suspend
             printf("Suspending...\n");
+            if (TEST_MODE) { return 0; }
+
 #if defined(PLATFORM_LINUX)
             /* Try several ways of suspending */
             if (system("systemctl suspend > /dev/null 2>&1") == 0) {
