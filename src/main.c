@@ -43,6 +43,54 @@ WINDOW *menu_window;
 WINDOW *menu_subwin;
 /* ---------------------- */
 
+void cleanup() {
+    // TODO do this for all menus and windows
+
+    /* Free up memory used by the menu */
+    unpost_menu(power_menu);
+    free_menu(power_menu);
+    for (i = 0; i < (option_count + 1); ++i) {
+        free_item(items[i]);
+    }
+    free(items);
+    delwin(menu_subwin);
+    delwin(menu_window);
+    /* ------------------------------- */
+}
+
+int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_interface_with) {
+    /* Handle input */
+    while ((input = wgetch(window_to_interface_with))) {
+        switch (input) {
+            case '\n':
+            case '\r':
+            case KEY_ENTER:
+                enter_pressed = true;
+                break;
+            case KEY_UP:
+            case KEY_LEFT:
+            case 'k':
+            case 'h':
+                menu_driver(power_menu, REQ_PREV_ITEM);
+                break;
+            case KEY_DOWN:
+            case KEY_RIGHT:
+            case 'j':
+            case 'l':
+                menu_driver(power_menu, REQ_NEXT_ITEM);
+                break;
+            case 27: // 27 is the raw value of ESC since there is no KEY macro
+                printf("Cancelled.\n");
+                return 3; // Force return 3 - index for cancel
+        }
+
+        if (enter_pressed) { break; } // Break free of while loop
+    }
+    /* ------------ */
+
+    return item_index(current_item(menu_to_interface_with)); // Return index of the selected option
+}
+
 int main(int argc, char *argv[]) {
     /* Get length of longest option */
     // TODO Un-hardcode this
@@ -94,36 +142,8 @@ int main(int argc, char *argv[]) {
     set_menu_sub(power_menu, menu_subwin);              // Set power menu subwindow
     post_menu(power_menu);                              // Display power menu
 
-    /* Handle input */
-    while (input = wgetch(menu_window)) {
-        switch (input) {
-            case '\n':
-            case '\r':
-            case KEY_ENTER:
-                enter_pressed = true;
-                break;
-            case KEY_UP:
-            case KEY_LEFT:
-            case 'k':
-            case 'h':
-                menu_driver(power_menu, REQ_PREV_ITEM);
-                break;
-            case KEY_DOWN:
-            case KEY_RIGHT:
-            case 'j':
-            case 'l':
-                menu_driver(power_menu, REQ_NEXT_ITEM);
-                break;
-            case 27: // 27 is the raw value of ESC since there is no KEY macro
-                printf("Cancelled.\n");
-                goto cleanup;
-        }
+    selected_option_index = get_user_selection_index(menu_window, power_menu); // Handle input
 
-        if (enter_pressed) { break; } // Break free of while loop
-    }
-    /* ------------ */
-
-    selected_option_index = item_index(current_item(power_menu));   // Get the index of the current option
 
     endwin();
 
@@ -165,23 +185,9 @@ int main(int argc, char *argv[]) {
             break;
         case 3: // Cancel
             printf("Cancelled.\n");
-            goto cleanup;
+            cleanup();
     }
     /* --------------------------- */
-
-
-    /* Free up memory used by the menu */
-cleanup:
-    unpost_menu(power_menu);
-    free_menu(power_menu);
-    for (i = 0; i < (option_count + 1); ++i) {
-        free_item(items[i]);
-    }
-    free(items);
-    delwin(menu_subwin);
-    delwin(menu_window);
-    endwin();
-    /* ------------------------------- */
 
     return 0;
 }
