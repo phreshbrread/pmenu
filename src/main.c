@@ -105,8 +105,16 @@ int main(int argc, char *argv[]) {
     if (strstr(argv[1], "-t")) {
         TEST_MODE = true;
         printf("Testing mode enabled.\n");
+        printf("Argc is: %d\n", argc);
     }
     /* ----------- */
+
+    for (i; i < argc; ++i) {
+        printf("Argv[%i]: %s\n", i, argv[i]);
+    }
+    i = 0;
+
+
 
     /* Get length of longest option */
     // TODO Un-hardcode this
