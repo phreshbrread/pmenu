@@ -72,7 +72,8 @@ void print_help_message() {
             "  -t --testing\t\tEnable testing mode (disables actual menu functions).\n"
             "\nNot yet implemented (planned):\n"
             "  -h --horizontal\tSet menu to display horizontally rather than vertically.\n"
-            "  -n --noconfirm\tDisable confirmation window.\n");
+            "  -n --noconfirm\tDisable confirmation window.\n"
+            "  -s --num-select\tEnable numbers for menu shortcuts\n");
 }
 
 int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_interface_with) {
