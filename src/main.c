@@ -111,7 +111,7 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
 
 void set_flags(int argc, char *argv[]) {
     /* Handle command line args */
-    for (i = 0; i < argc; ++i) {
+    for (i = 1; i < argc; ++i) { // Start 'i' at 1 because argv[0] = current binary path
         if (strstr(argv[i], "--help")) {
             print_help_message();
             exit(0);
