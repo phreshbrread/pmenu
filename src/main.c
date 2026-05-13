@@ -6,7 +6,9 @@
 #include <menu.h>
 
 /* Flags */
-bool TEST_MODE = false;
+bool TEST_MODE          = false;
+bool DISPLAY_HORIZONTAL = false;
+bool NO_CONFIRM         = false;
 /* ----- */
 
 
@@ -63,6 +65,16 @@ void cleanup() {
     /* ------------------------------- */
 }
 
+void print_help_message() {
+    printf("Valid arguments:\n"
+            "     --version\t\tPrint current version.\n"
+            "     --help\t\tPrint this help message.\n"
+            "  -t --testing\t\tEnable testing mode (disables actual menu functions).\n"
+            "\nNot yet implemented (planned):\n"
+            "  -h --horizontal\tSet menu to display horizontally rather than vertically.\n"
+            "  -n --noconfirm\tDisable confirmation window.\n");
+}
+
 int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_interface_with) {
     /* Handle input */
     while ((input = wgetch(window_to_interface_with))) {
@@ -97,24 +109,49 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
     return item_index(current_item(menu_to_interface_with)); // Return index of the selected option
 }
 
-int main(int argc, char *argv[]) {
-
-    /* Handle args */
-    // Quick and dirty for now
-    // TODO improve
-    if (strstr(argv[1], "-t")) {
-        TEST_MODE = true;
-        printf("Testing mode enabled.\n");
-        printf("Argc is: %d\n", argc);
+void set_flags(int argc, char *argv[]) {
+    /* Handle command line args */
+    for (i = 0; i < argc; ++i) {
+        if (strstr(argv[i], "--help")) {
+            print_help_message();
+            exit(0);
+        }
+        else if (strstr(argv[i], "--version")) {
+            printf("pmenu version %s\n", version);
+            exit(0);
+        }
+        else if (strstr(argv[i], "-t") || strstr(argv[i], "--testing")) {
+            TEST_MODE = true;
+            printf("Testing mode enabled.\n");
+        }
+        else if (strstr(argv[i], "-h") || strstr(argv[i], "--horizontal")) {
+            DISPLAY_HORIZONTAL = true;
+            printf("Horizontal menu enabled.\n");
+        }
+        else if (strstr(argv[i], "-n") || strstr(argv[i], "--noconfirm")) {
+            NO_CONFIRM = true;
+            printf("Confirmation window disabled.\n");
+        }
+        else {
+            print_help_message();
+            exit(0);
+        }
     }
-    /* ----------- */
 
-    for (i; i < argc; ++i) {
+    /* ------------------------ */
+
+    /* Print args for dev purposes */
+    printf("argc is: %d\n", argc);
+    for (i = 0; i < argc; ++i) {
         printf("Argv[%i]: %s\n", i, argv[i]);
     }
-    i = 0;
+    /* --------------------------- */
+}
 
-
+int main(int argc, char *argv[]) {
+    if (argc > 1) {
+        set_flags(argc, argv);
+    }
 
     /* Get length of longest option */
     // TODO Un-hardcode this
@@ -137,7 +174,7 @@ int main(int argc, char *argv[]) {
     items = calloc(option_count + 1, sizeof(ITEM *));
 
     /* Create menu items from options array */
-    for (i; i < option_count; ++i) {
+    for (i = 0; i < option_count; ++i) {
         items[i] = new_item(options[i], options[i]);
     }
     items[option_count] = (ITEM *)NULL; // Terminate option list with null pointer
@@ -161,6 +198,11 @@ int main(int argc, char *argv[]) {
 
     // Create derived window in the middle of the main window
     menu_subwin = derwin(menu_window, 0, 0, sub_max_y / 4, sub_max_x / 4);
+
+    if(TEST_MODE) {
+        printw("TEST MODE");
+        refresh();
+    }
 
     mvwprintw(menu_window, 0, 2, "pmenu %s", version);  // Window titlebar
     set_menu_sub(power_menu, menu_subwin);              // Set power menu subwindow
