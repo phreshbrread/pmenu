@@ -5,6 +5,13 @@
 #include <ncurses.h>
 #include <menu.h>
 
+/* Flags */
+bool TEST_MODE          = false;
+bool DISPLAY_HORIZONTAL = false;
+bool NO_CONFIRM         = false;
+/* ----- */
+
+
 /* Determine platform at compilation */
 #if defined(__linux__)
 #define PLATFORM_LINUX
@@ -22,11 +29,11 @@ int max_y                   = 0;
 int sub_max_x               = 0;
 int sub_max_y               = 0;
 
-bool enter_pressed          = false;
+char *options[]                 = { "Shutdown", "Reboot", "Suspend", "Cancel" };
+int option_count                = sizeof(options) / sizeof(char *);
+int longest_option_char_count   = 0;
 
-char *options[] = { "Shutdown", "Reboot", "Suspend", "Cancel" };
-int option_count = sizeof(options) / sizeof(char *);    // Determine number of array entries
-int longest_option_char_count;
+bool enter_pressed = false;
 /* ------------------------ */
 
 /* Get version from file */
@@ -43,57 +50,34 @@ WINDOW *menu_window;
 WINDOW *menu_subwin;
 /* ---------------------- */
 
-int main(int argc, char *argv[]) {
-    // TODO Un-hardcode this
-    longest_option_char_count = strlen(options[0]); // Get length of longest menu option
+void cleanup() {
+    // TODO do this for all menus and windows
 
-    /* Initialise ncurses */
-    set_escdelay(50); // Set delay for escape key
-    initscr();
-    cbreak();
-    noecho();
-    keypad(stdscr, TRUE);
-    /* ------------------ */
-
-    getmaxyx(stdscr, max_y, max_x); // Get size of terminal window
-
-    // TODO Allow for mouse usage
-
-    // Allocate memory for array of pointers to ITEM, zero-initialising everything so the last item is NULL
-    items = calloc(option_count + 1, sizeof(ITEM *));
-
-    /* Create menu items from options array */
-    for (i; i < option_count; ++i) {
-        items[i] = new_item(options[i], options[i]);
+    /* Free up memory used by the menu */
+    unpost_menu(power_menu);
+    free_menu(power_menu);
+    for (i = 0; i < (option_count + 1); ++i) {
+        free_item(items[i]);
     }
-    items[option_count] = (ITEM *)NULL; // Terminate option list with null pointer
-    /* ------------------------------------ */
+    free(items);
+    delwin(menu_subwin);
+    delwin(menu_window);
+    /* ------------------------------- */
+}
 
-    /* Create main window for menu */
-    power_menu = new_menu((ITEM **)items);  // Create menu based off items
-    menu_opts_off(power_menu, O_NONCYCLIC); // Force enable menu wrapping
-    menu_opts_off(power_menu, O_SHOWDESC); // Disable item descriptions
-    set_menu_mark(power_menu, ">");         // Set menu marker
+void print_help_message() {
+    printf("Valid arguments:\n"
+            "     --version\t\tPrint current version.\n"
+            "     --help\t\tPrint this help message.\n"
+            "  -t --testing\t\tEnable testing mode (disables actual menu functions).\n"
+            "\nNot yet implemented (planned):\n"
+            "  -h --horizontal\tSet menu to display horizontally rather than vertically.\n"
+            "  -n --noconfirm\tDisable confirmation window.\n");
+}
 
-    // Create main menu window using size of power menu + padding
-    menu_window = newwin(option_count + 4, longest_option_char_count + 10, max_y / 2 - option_count, max_x / 2 - longest_option_char_count);
-
-    keypad(menu_window, TRUE);
-    box(menu_window, 0, 0);
-    /* ---------------------- */
-
-    getmaxyx(menu_window, sub_max_y, sub_max_x);    // Get size of main menu window
-    set_menu_win(power_menu, menu_window);          // Assign power menu to the main menu window
-
-    // Create derived window in the middle of the main window
-    menu_subwin = derwin(menu_window, 0, 0, sub_max_y / 4, sub_max_x / 4);
-
-    mvwprintw(menu_window, 0, 2, "pmenu %s", version);  // Window titlebar
-    set_menu_sub(power_menu, menu_subwin);              // Set power menu subwindow
-    post_menu(power_menu);                              // Display power menu
-
+int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_interface_with) {
     /* Handle input */
-    while (input = wgetch(menu_window)) {
+    while ((input = wgetch(window_to_interface_with))) {
         switch (input) {
             case '\n':
             case '\r':
@@ -114,14 +98,117 @@ int main(int argc, char *argv[]) {
                 break;
             case 27: // 27 is the raw value of ESC since there is no KEY macro
                 printf("Cancelled.\n");
-                goto cleanup;
+                return 3; // Force return 3 - index for cancel
         }
 
         if (enter_pressed) { break; } // Break free of while loop
     }
     /* ------------ */
 
-    selected_option_index = item_index(current_item(power_menu));   // Get the index of the current option
+    enter_pressed = false; // Revert enter state
+    return item_index(current_item(menu_to_interface_with)); // Return index of the selected option
+}
+
+void set_flags(int argc, char *argv[]) {
+    /* Handle command line args */
+    for (i = 1; i < argc; ++i) { // Start 'i' at 1 because argv[0] = current binary path
+        if (strstr(argv[i], "--help")) {
+            print_help_message();
+            exit(0);
+        }
+        else if (strstr(argv[i], "--version")) {
+            printf("pmenu version %s\n", version);
+            exit(0);
+        }
+        else if (strstr(argv[i], "-t") || strstr(argv[i], "--testing")) {
+            TEST_MODE = true;
+            printf("Testing mode enabled.\n");
+        }
+        else if (strstr(argv[i], "-h") || strstr(argv[i], "--horizontal")) {
+            DISPLAY_HORIZONTAL = true;
+            printf("Horizontal menu enabled.\n");
+        }
+        else if (strstr(argv[i], "-n") || strstr(argv[i], "--noconfirm")) {
+            NO_CONFIRM = true;
+            printf("Confirmation window disabled.\n");
+        }
+        else {
+            print_help_message();
+            exit(0);
+        }
+    }
+
+    /* ------------------------ */
+
+    /* Print args for dev purposes */
+    printf("argc is: %d\n", argc);
+    for (i = 0; i < argc; ++i) {
+        printf("Argv[%i]: %s\n", i, argv[i]);
+    }
+    /* --------------------------- */
+}
+
+int main(int argc, char *argv[]) {
+    if (argc > 1) {
+        set_flags(argc, argv);
+    }
+
+    /* Get length of longest option */
+    // TODO Un-hardcode this
+    longest_option_char_count = strlen(options[0]); // Get length of longest menu option
+    /* ---------------------------- */
+
+    /* Initialise ncurses */
+    set_escdelay(50); // Set delay for escape key
+    initscr();
+    cbreak();
+    noecho();
+    keypad(stdscr, TRUE);
+    /* ------------------ */
+
+    getmaxyx(stdscr, max_y, max_x); // Get size of terminal window
+
+    // TODO Allow for mouse usage
+
+    // Allocate memory for array of pointers to ITEM, zero-initialising everything so the last item is NULL
+    items = calloc(option_count + 1, sizeof(ITEM *));
+
+    /* Create menu items from options array */
+    for (i = 0; i < option_count; ++i) {
+        items[i] = new_item(options[i], options[i]);
+    }
+    items[option_count] = (ITEM *)NULL; // Terminate option list with null pointer
+    /* ------------------------------------ */
+
+    /* Create main window for menu */
+    power_menu = new_menu((ITEM **)items);  // Create menu based off items
+    menu_opts_off(power_menu, O_NONCYCLIC); // Force enable menu wrapping
+    menu_opts_off(power_menu, O_SHOWDESC); // Disable item descriptions
+    set_menu_mark(power_menu, ">");         // Set menu marker
+
+    // Create main menu window using size of menu + padding
+    menu_window = newwin(option_count + 4, longest_option_char_count + 10, max_y / 2 - option_count, max_x / 2 - longest_option_char_count);
+
+    keypad(menu_window, TRUE);
+    box(menu_window, 0, 0);
+    /* ---------------------- */
+
+    getmaxyx(menu_window, sub_max_y, sub_max_x);    // Get size of main menu window
+    set_menu_win(power_menu, menu_window);          // Assign power menu to the main menu window
+
+    // Create derived window in the middle of the main window
+    menu_subwin = derwin(menu_window, 0, 0, sub_max_y / 4, sub_max_x / 4);
+
+    if(TEST_MODE) {
+        printw("TEST MODE");
+        refresh();
+    }
+
+    mvwprintw(menu_window, 0, 2, "pmenu %s", version);  // Window titlebar
+    set_menu_sub(power_menu, menu_subwin);              // Set power menu subwindow
+    post_menu(power_menu);                              // Display power menu
+
+    selected_option_index = get_user_selection_index(menu_window, power_menu); // Handle input
 
     endwin();
 
@@ -131,6 +218,7 @@ int main(int argc, char *argv[]) {
     switch (selected_option_index) {
         case 0: // Shutdown
             printf("Shutting down...\n");
+            if (TEST_MODE) { return 0; }
 
 #if defined(PLATFORM_LINUX)
             // TODO Try several different shutdown options since Gentoo and Guix use different commands
@@ -141,10 +229,14 @@ int main(int argc, char *argv[]) {
             break;
         case 1: // Reboot
             printf("Rebooting...\n");
+            if (TEST_MODE) { return 0; }
+
             system("shutdown -r now");      // Works for both Linux and BSD
             break;
         case 2: // Suspend
             printf("Suspending...\n");
+            if (TEST_MODE) { return 0; }
+
 #if defined(PLATFORM_LINUX)
             /* Try several ways of suspending */
             if (system("systemctl suspend > /dev/null 2>&1") == 0) {
@@ -163,23 +255,9 @@ int main(int argc, char *argv[]) {
             break;
         case 3: // Cancel
             printf("Cancelled.\n");
-            goto cleanup;
+            cleanup();
     }
     /* --------------------------- */
-
-
-    /* Free up memory used by the menu */
-cleanup:
-    unpost_menu(power_menu);
-    free_menu(power_menu);
-    for (i = 0; i < (option_count + 1); ++i) {
-        free_item(items[i]);
-    }
-    free(items);
-    delwin(menu_subwin);
-    delwin(menu_window);
-    endwin();
-    /* ------------------------------- */
 
     return 0;
 }
