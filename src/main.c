@@ -61,7 +61,7 @@ void cleanup() {
     /* ------------------------------- */
 }
 
-void print_help_message() {
+void show_help_message() {
     printf("Valid arguments:\n"
             "     --help\t\tShow this help message.\n"
             "  -t --testing\t\tEnable testing mode (disables actual menu functions).\n"
@@ -74,6 +74,8 @@ void print_help_message() {
 }
 
 int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_interface_with) {
+    menu_driver(menu_to_interface_with, REQ_FIRST_ITEM);
+
     /* Handle input */
     while ((input = wgetch(window_to_interface_with))) {
         switch (input) {
@@ -124,7 +126,7 @@ void set_flags(int argc, char *argv[]) {
     /* Handle command line args */
     for (i = 1; i < argc; ++i) { // Start 'i' at 1 because argv[0] = current binary path
         if (strstr(argv[i], "--help")) {
-            print_help_message();
+            show_help_message();
             exit(0);
         }
         else if (strstr(argv[i], "-v") || strstr(argv[i], "--version")) {
@@ -148,7 +150,7 @@ void set_flags(int argc, char *argv[]) {
             printf("Number selection enabled.\n");
         }
         else {
-            print_help_message();
+            show_help_message();
             exit(0);
         }
     }
@@ -225,9 +227,46 @@ int main(int argc, char *argv[]) {
 
     selected_option_index = get_user_selection_index(menu_window, power_menu); // Handle input
 
-    endwin();
-
     // TODO Add confirmation dialogue
+    /* Confirmation */
+    /*
+       if (!NO_CONFIRM) {
+    /* Create confirmation menu */
+    /*
+       ITEM **confirm_items;
+       MENU *confirm_menu;
+
+       confirm_items = calloc(4, sizeof(ITEM *));
+       items[0] = new_item("Yes",  NULL);
+       items[1] = new_item("No",   NULL);
+       items[3] = (ITEM *)NULL;
+    /* ------------------------ */
+    /*
+       WINDOW *confirm_menu_subwin = derwin(menu_window, 0, 0, sub_max_y / 4, sub_max_x / 4);
+       unpost_menu(power_menu);
+
+
+       unpost_menu(power_menu);
+       clear();
+    /*
+    set_menu_items(power_menu, confirm_items);
+    post_menu(power_menu);
+    */
+    /*
+       wrefresh(menu_window);
+
+       confirm_menu = new_menu((ITEM **)items);
+       set_menu_win(confirm_menu, menu_window);
+       set_menu_sub(confirm_menu, confirm_menu_subwin);
+       post_menu(confirm_menu);
+
+       get_user_selection_index(menu_window, confirm_menu);
+
+       }
+       */
+    /* ------------ */
+
+    endwin();
 
     /* Handle selected menu option */
     switch (selected_option_index) {
