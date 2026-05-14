@@ -63,10 +63,10 @@ void cleanup() {
 
 void print_help_message() {
     printf("Valid arguments:\n"
-            "     --version\t\tPrint current version.\n"
-            "     --help\t\tPrint this help message.\n"
+            "     --help\t\tShow this help message.\n"
             "  -t --testing\t\tEnable testing mode (disables actual menu functions).\n"
             "  -s --num-select\tEnable number key usage for menu options.\n"
+            "  -v --version\t\tShow current version.\n"
             "\nNot yet implemented (planned):\n"
             "  -h --horizontal\tSet menu to display horizontally rather than vertically.\n"
             "  -d --noconfirm\tDisable confirmation window.\n"
@@ -119,13 +119,15 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
 }
 
 void set_flags(int argc, char *argv[]) {
+    // TODO Match exact input to prevent cases like "-help" enabling DISPLAY_HORIZONTAL
+
     /* Handle command line args */
     for (i = 1; i < argc; ++i) { // Start 'i' at 1 because argv[0] = current binary path
         if (strstr(argv[i], "--help")) {
             print_help_message();
             exit(0);
         }
-        else if (strstr(argv[i], "--version")) {
+        else if (strstr(argv[i], "-v") || strstr(argv[i], "--version")) {
             printf("pmenu version %s\n", version);
             exit(0);
         }
