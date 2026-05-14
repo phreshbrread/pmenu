@@ -5,13 +5,8 @@
 #include <ncurses.h>
 #include <menu.h>
 
-/* Flags */
-bool TEST_MODE          = false;
-bool DISPLAY_HORIZONTAL = false;
-bool NO_CONFIRM         = false;
-bool NUM_SELECT         = false;
-/* ----- */
-
+// Flags
+bool TEST_MODE, NUM_SELECT, DISPLAY_HORIZONTAL, NO_CONFIRM = false;
 
 /* Determine platform at compilation */
 #if defined(__linux__)
@@ -71,10 +66,10 @@ void print_help_message() {
             "     --version\t\tPrint current version.\n"
             "     --help\t\tPrint this help message.\n"
             "  -t --testing\t\tEnable testing mode (disables actual menu functions).\n"
+            "  -s --num-select\tEnable number key usage for menu options.\n"
             "\nNot yet implemented (planned):\n"
             "  -h --horizontal\tSet menu to display horizontally rather than vertically.\n"
-            "  -n --noconfirm\tDisable confirmation window.\n"
-            "  -s --num-select\tEnable numbers for menu shortcuts\n");
+            "  -n --noconfirm\tDisable confirmation window.\n");
 }
 
 int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_interface_with) {
