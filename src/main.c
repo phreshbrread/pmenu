@@ -9,6 +9,7 @@
 bool TEST_MODE          = false;
 bool DISPLAY_HORIZONTAL = false;
 bool NO_CONFIRM         = false;
+bool NUM_SELECT         = false;
 /* ----- */
 
 
@@ -100,6 +101,17 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
             case 27: // 27 is the raw value of ESC since there is no KEY macro
                 printf("Cancelled.\n");
                 return 3; // Force return 3 - index for cancel
+            case 49: // Raw value for '1'
+                if (NUM_SELECT) { return 0; }
+            case 50: // Raw value for '2'
+                if (NUM_SELECT) { return 1; }
+            case 51: // Raw value for '3'
+                if (NUM_SELECT) { return 2; }
+            case 52: // Raw value for '4'
+                if (NUM_SELECT) {
+                    printf("Cancelled.\n");
+                    return 3;
+                }
         }
 
         if (enter_pressed) { break; } // Break free of while loop
@@ -132,6 +144,10 @@ void set_flags(int argc, char *argv[]) {
         else if (strstr(argv[i], "-n") || strstr(argv[i], "--noconfirm")) {
             NO_CONFIRM = true;
             printf("Confirmation window disabled.\n");
+        }
+        else if (strstr(argv[i], "-s") || strstr(argv[i], "--num-select")) {
+            NUM_SELECT = true;
+            printf("Number selection enabled.\n");
         }
         else {
             print_help_message();
