@@ -69,7 +69,8 @@ void print_help_message() {
             "  -s --num-select\tEnable number key usage for menu options.\n"
             "\nNot yet implemented (planned):\n"
             "  -h --horizontal\tSet menu to display horizontally rather than vertically.\n"
-            "  -n --noconfirm\tDisable confirmation window.\n");
+            "  -d --noconfirm\tDisable confirmation window.\n"
+            "  -n --show-nums\tDisplay numbers before menu entries\n");
 }
 
 int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_interface_with) {
@@ -136,7 +137,7 @@ void set_flags(int argc, char *argv[]) {
             DISPLAY_HORIZONTAL = true;
             printf("Horizontal menu enabled.\n");
         }
-        else if (strstr(argv[i], "-n") || strstr(argv[i], "--noconfirm")) {
+        else if (strstr(argv[i], "-d") || strstr(argv[i], "--noconfirm")) {
             NO_CONFIRM = true;
             printf("Confirmation window disabled.\n");
         }
