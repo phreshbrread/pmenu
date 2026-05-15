@@ -5,12 +5,8 @@
 #include <ncurses.h>
 #include <menu.h>
 
-/* Flags */
-bool TEST_MODE          = false;
-bool DISPLAY_HORIZONTAL = false;
-bool NO_CONFIRM         = false;
-/* ----- */
-
+// Flags
+bool TEST_MODE, NUM_SELECT, DISPLAY_HORIZONTAL, NO_CONFIRM = false;
 
 /* Determine platform at compilation */
 #if defined(__linux__)
@@ -22,18 +18,14 @@ bool NO_CONFIRM         = false;
 
 /* Declare global variables */
 int selected_option_index   = 3;    // Default to 3 for cancel
-int input                   = 0;
-int i                       = 0;
-int max_x                   = 0;
-int max_y                   = 0;
-int sub_max_x               = 0;
-int sub_max_y               = 0;
+
+int i, input, max_x, max_y, sub_max_x, sub_max_y = 0;
 
 char *options[]                 = { "Shutdown", "Reboot", "Suspend", "Cancel" };
 int option_count                = sizeof(options) / sizeof(char *);
 int longest_option_char_count   = 0;
 
-bool enter_pressed = false;
+bool enter_pressed, choice_confirmed = false;
 /* ------------------------ */
 
 /* Get version from file */
@@ -65,17 +57,21 @@ void cleanup() {
     /* ------------------------------- */
 }
 
-void print_help_message() {
+void show_help_message() {
     printf("Valid arguments:\n"
-            "     --version\t\tPrint current version.\n"
-            "     --help\t\tPrint this help message.\n"
+            "     --help\t\tShow this help message.\n"
             "  -t --testing\t\tEnable testing mode (disables actual menu functions).\n"
+            "  -s --num-select\tEnable number key usage for menu options.\n"
+            "  -v --version\t\tShow current version.\n"
             "\nNot yet implemented (planned):\n"
             "  -h --horizontal\tSet menu to display horizontally rather than vertically.\n"
-            "  -n --noconfirm\tDisable confirmation window.\n");
+            "  -d --noconfirm\tDisable confirmation window.\n"
+            "  -n --show-nums\tDisplay numbers before menu entries\n");
 }
 
 int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_interface_with) {
+    menu_driver(menu_to_interface_with, REQ_FIRST_ITEM);
+
     /* Handle input */
     while ((input = wgetch(window_to_interface_with))) {
         switch (input) {
@@ -98,7 +94,20 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
                 break;
             case 27: // 27 is the raw value of ESC since there is no KEY macro
                 printf("Cancelled.\n");
+                choice_confirmed = true;
                 return 3; // Force return 3 - index for cancel
+            case 49: // Raw value for '1'
+                if (NUM_SELECT) { return 0; }
+            case 50: // Raw value for '2'
+                if (NUM_SELECT) { return 1; }
+            case 51: // Raw value for '3'
+                if (NUM_SELECT) { return 2; }
+            case 52: // Raw value for '4'
+                if (NUM_SELECT) {
+                    printf("Cancelled.\n");
+                    choice_confirmed = true;
+                    return 3;
+                }
         }
 
         if (enter_pressed) { break; } // Break free of while loop
@@ -110,13 +119,15 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
 }
 
 void set_flags(int argc, char *argv[]) {
+    // TODO Match exact input to prevent cases like "-help" enabling DISPLAY_HORIZONTAL
+
     /* Handle command line args */
     for (i = 1; i < argc; ++i) { // Start 'i' at 1 because argv[0] = current binary path
         if (strstr(argv[i], "--help")) {
-            print_help_message();
+            show_help_message();
             exit(0);
         }
-        else if (strstr(argv[i], "--version")) {
+        else if (strstr(argv[i], "-v") || strstr(argv[i], "--version")) {
             printf("pmenu version %s\n", version);
             exit(0);
         }
@@ -128,12 +139,16 @@ void set_flags(int argc, char *argv[]) {
             DISPLAY_HORIZONTAL = true;
             printf("Horizontal menu enabled.\n");
         }
-        else if (strstr(argv[i], "-n") || strstr(argv[i], "--noconfirm")) {
+        else if (strstr(argv[i], "-d") || strstr(argv[i], "--noconfirm")) {
             NO_CONFIRM = true;
             printf("Confirmation window disabled.\n");
         }
+        else if (strstr(argv[i], "-s") || strstr(argv[i], "--num-select")) {
+            NUM_SELECT = true;
+            printf("Number selection enabled.\n");
+        }
         else {
-            print_help_message();
+            show_help_message();
             exit(0);
         }
     }
@@ -204,15 +219,59 @@ int main(int argc, char *argv[]) {
         refresh();
     }
 
-    mvwprintw(menu_window, 0, 2, "pmenu %s", version);  // Window titlebar
-    set_menu_sub(power_menu, menu_subwin);              // Set power menu subwindow
-    post_menu(power_menu);                              // Display power menu
+    while (!choice_confirmed) {
+        mvwprintw(menu_window, 0, 2, "pmenu %s", version);  // Window titlebar
+        set_menu_sub(power_menu, menu_subwin);              // Set power menu subwindow
+        post_menu(power_menu);                              // Display power menu
 
-    selected_option_index = get_user_selection_index(menu_window, power_menu); // Handle input
+        selected_option_index = get_user_selection_index(menu_window, power_menu); // Handle input
+        if(selected_option_index == 3) { choice_confirmed = true; }
+
+        // TODO Add confirmation dialogue
+        /* Confirmation */
+        /*
+           if (!NO_CONFIRM) {
+        /* Create confirmation menu */
+        /*
+           ITEM **confirm_items;
+           MENU *confirm_menu;
+
+           confirm_items = calloc(4, sizeof(ITEM *));
+           items[0] = new_item("Yes",  NULL);
+           items[1] = new_item("No",   NULL);
+           items[3] = (ITEM *)NULL;
+        /* ------------------------ */
+        /*
+           WINDOW *confirm_menu_subwin = derwin(menu_window, 0, 0, sub_max_y / 4, sub_max_x / 4);
+           unpost_menu(power_menu);
+
+
+           unpost_menu(power_menu);
+           clear();
+        /*
+        set_menu_items(power_menu, confirm_items);
+        post_menu(power_menu);
+        */
+        /*
+           wrefresh(menu_window);
+
+           confirm_menu = new_menu((ITEM **)items);
+           set_menu_win(confirm_menu, menu_window);
+           set_menu_sub(confirm_menu, confirm_menu_subwin);
+           post_menu(confirm_menu);
+
+           get_user_selection_index(menu_window, confirm_menu);
+
+           }
+           */
+        /* ------------ */
+
+        // TEMP ENABLE NO_CONFIRM UNTIL FEATURE IS COMPLETE
+        NO_CONFIRM = true;
+        if (NO_CONFIRM) { choice_confirmed = true; }
+    }
 
     endwin();
-
-    // TODO Add confirmation dialogue
 
     /* Handle selected menu option */
     switch (selected_option_index) {
