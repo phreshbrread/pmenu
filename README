@@ -38,12 +38,14 @@ Dependencies
 ------------
     - ncurses
 
-Build with nix (recommended)
+With nix
 ------------------------
+
 Simply run 'nix build' or 'nix run' to build according to the included flake.nix
 
 Manual build
 ------------
+
 Run the following to build using cmake:
     mkdir -p build && cmake -B build && cmake --build build
 
