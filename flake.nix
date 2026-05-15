@@ -8,6 +8,7 @@
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
       pkgVersionFromFile = builtins.replaceStrings ["\""] [""] (nixpkgs.lib.fileContents ./src/version.txt);
+      fs = nixpkgs.lib.fileset;
     in {
       devShells.${system}.default = pkgs.mkShell {
         # Tools for use in dev shell
@@ -15,6 +16,7 @@
           gcc
           ncurses
           gdb
+          cmake
         ];
       };
 
@@ -22,21 +24,32 @@
           pmenu = pkgs.stdenv.mkDerivation {
             pname = "pmenu";
             version = "${pkgVersionFromFile}";
-            src = ./.;
+            src = fs.toSource rec {
+              root = ./.;
+              fileset = fs.unions [
+                  ./CMakeLists.txt
+                  ./src/version.txt
+                  ./src/main.c
+              ];
+            };
 
             # Needed during build phase
             nativeBuildInputs = with pkgs; [
               gcc # Included in stdenv anyways
+              cmake
             ];
 
             # Needed during runtime
             buildInputs = with pkgs; [
               ncurses
             ];
-
+/*
             # Build package
             buildPhase = ''
-              gcc -Wall -Wextra -Wpedantic --std=c99 -lmenu -lncurses -ltinfo ./src/main.c -o pmenu
+              #gcc -Wall -Wextra -Wpedantic --std=c99 -lmenu -lncurses -ltinfo ./src/main.c -o pmenu
+              mkdir -p build
+              cmake -B build
+              cmake --build build
             '';
 
             # Install package
@@ -44,6 +57,7 @@
               mkdir -p $out/bin
               cp pmenu $out/bin/
             '';
+            */
 
             # Package metadata
             meta = with pkgs.lib; {

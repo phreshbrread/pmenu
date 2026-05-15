@@ -1,5 +1,6 @@
 .direnv/
 output/
 result/
+build/
 result
 pmenu
