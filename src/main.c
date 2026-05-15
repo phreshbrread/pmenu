@@ -265,6 +265,9 @@ int main(int argc, char *argv[]) {
            }
            */
         /* ------------ */
+
+        // TEMP ENABLE NO_CONFIRM UNTIL FEATURE IS COMPLETE
+        NO_CONFIRM = true;
         if (NO_CONFIRM) { choice_confirmed = true; }
     }
 
