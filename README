@@ -44,5 +44,7 @@ Simply run 'nix build' or 'nix run' to build according to the included flake.nix
 
 Manual build
 ------------
-Script is included in this repo.
-While meant to be built with gcc, other c compilers should work just fine since this is such a simple program.
+Run the following to build using cmake:
+    mkdir -p build && cmake -B build && cmake --build build
+
+This will output a binary at ./build/pmenu

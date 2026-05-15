@@ -43,21 +43,8 @@
             buildInputs = with pkgs; [
               ncurses
             ];
-/*
-            # Build package
-            buildPhase = ''
-              #gcc -Wall -Wextra -Wpedantic --std=c99 -lmenu -lncurses -ltinfo ./src/main.c -o pmenu
-              mkdir -p build
-              cmake -B build
-              cmake --build build
-            '';
 
-            # Install package
-            installPhase = ''
-              mkdir -p $out/bin
-              cp pmenu $out/bin/
-            '';
-            */
+            # Build & Install phases handled by cmake
 
             # Package metadata
             meta = with pkgs.lib; {
@@ -67,7 +54,7 @@
             };
           };
 
-          # Make default package when running 'nix build'
+          # Make default package when running 'nix run / build'
           default = self.packages.${system}.pmenu;
         };
     };
