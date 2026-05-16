@@ -40,21 +40,40 @@ MENU *power_menu;
 MEVENT mouse_event;
 WINDOW *menu_window;
 WINDOW *menu_subwin;
+
+ITEM **confirm_items;
+MENU *confirm_menu;
 /* ---------------------- */
 
 void cleanup() {
-    // TODO do this for all menus and windows
-
-    /* Free up memory used by the menu */
+    /* Free memory used by main menu */
     unpost_menu(power_menu);
     free_menu(power_menu);
     for (i = 0; i < (option_count + 1); ++i) {
         free_item(items[i]);
     }
     free(items);
+    /* ----------------------------- */
+
+    /* Free confirm menu memory */
+    unpost_menu(confirm_menu);
+    free_menu(confirm_menu);
+
+    for (i = 0; i < 3; ++i) {
+        free_item(confirm_items[i]);
+    }
+    free(confirm_items);
+    /* ------------------------ */
+
     delwin(menu_subwin);
     delwin(menu_window);
-    /* ------------------------------- */
+}
+
+void cancel_and_exit() {
+    cleanup();
+    endwin();
+    printf("Cancelled.\n");
+    exit(0);
 }
 
 void show_help_message() {
@@ -93,9 +112,7 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
                 menu_driver(power_menu, REQ_NEXT_ITEM);
                 break;
             case 27: // 27 is the raw value of ESC since there is no KEY macro
-                printf("Cancelled.\n");
-                choice_confirmed = true;
-                return 3; // Force return 3 - index for cancel
+                cancel_and_exit();
             case 49: // Raw value for '1'
                 if (NUM_SELECT) { return 0; }
             case 50: // Raw value for '2'
@@ -104,9 +121,7 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
                 if (NUM_SELECT) { return 2; }
             case 52: // Raw value for '4'
                 if (NUM_SELECT) {
-                    printf("Cancelled.\n");
-                    choice_confirmed = true;
-                    return 3;
+                    cancel_and_exit();
                 }
         }
 
@@ -195,6 +210,14 @@ int main(int argc, char *argv[]) {
     items[option_count] = (ITEM *)NULL; // Terminate option list with null pointer
     /* ------------------------------------ */
 
+
+    /* Create confirmation menu options */
+    confirm_items = calloc(4, sizeof(ITEM *));
+    confirm_items[0] = new_item("Yes",  NULL);
+    confirm_items[1] = new_item("No",   NULL);
+    confirm_items[3] = (ITEM *)NULL;
+    /* -------------------------------- */
+
     /* Create main window for menu */
     power_menu = new_menu((ITEM **)items);  // Create menu based off items
     menu_opts_off(power_menu, O_NONCYCLIC); // Force enable menu wrapping
@@ -231,23 +254,13 @@ int main(int argc, char *argv[]) {
         /* Confirmation */
         /*
            if (!NO_CONFIRM) {
-        /* Create confirmation menu */
         /*
-           ITEM **confirm_items;
-           MENU *confirm_menu;
-
-           confirm_items = calloc(4, sizeof(ITEM *));
-           items[0] = new_item("Yes",  NULL);
-           items[1] = new_item("No",   NULL);
-           items[3] = (ITEM *)NULL;
-        /* ------------------------ */
-        /*
-           WINDOW *confirm_menu_subwin = derwin(menu_window, 0, 0, sub_max_y / 4, sub_max_x / 4);
-           unpost_menu(power_menu);
+        WINDOW *confirm_menu_subwin = derwin(menu_window, 0, 0, sub_max_y / 4, sub_max_x / 4);
+        unpost_menu(power_menu);
 
 
-           unpost_menu(power_menu);
-           clear();
+        unpost_menu(power_menu);
+        clear();
         /*
         set_menu_items(power_menu, confirm_items);
         post_menu(power_menu);
@@ -313,8 +326,7 @@ int main(int argc, char *argv[]) {
 #endif
             break;
         case 3: // Cancel
-            printf("Cancelled.\n");
-            cleanup();
+            cancel_and_exit();
     }
     /* --------------------------- */
 
