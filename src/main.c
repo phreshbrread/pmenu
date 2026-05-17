@@ -103,13 +103,13 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
             case KEY_LEFT:
             case 'k':
             case 'h':
-                menu_driver(power_menu, REQ_PREV_ITEM);
+                menu_driver(menu_to_interface_with, REQ_PREV_ITEM);
                 break;
             case KEY_DOWN:
             case KEY_RIGHT:
             case 'j':
             case 'l':
-                menu_driver(power_menu, REQ_NEXT_ITEM);
+                menu_driver(menu_to_interface_with, REQ_NEXT_ITEM);
                 break;
             case 27: // 27 is the raw value of ESC since there is no KEY macro
                 cancel_and_exit();
@@ -120,9 +120,7 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
             case 51: // Raw value for '3'
                 if (NUM_SELECT) { return 2; }
             case 52: // Raw value for '4'
-                if (NUM_SELECT) {
-                    cancel_and_exit();
-                }
+                if (NUM_SELECT) { cancel_and_exit(); }
         }
 
         if (enter_pressed) { break; } // Break free of while loop
@@ -208,27 +206,25 @@ int main(int argc, char *argv[]) {
         items[i] = new_item(options[i], options[i]);
     }
     items[option_count] = (ITEM *)NULL; // Terminate option list with null pointer
+
+    power_menu = new_menu((ITEM **)items);  // Create menu based off items
+    menu_opts_off(power_menu, O_NONCYCLIC); // Force enable menu wrapping
+    menu_opts_off(power_menu, O_SHOWDESC);  // Disable item descriptions
+    set_menu_mark(power_menu, ">");         // Set menu marker
     /* ------------------------------------ */
 
-
     /* Create confirmation menu options */
-    confirm_items = calloc(4, sizeof(ITEM *));
+    confirm_items = calloc(3, sizeof(ITEM *));
     confirm_items[0] = new_item("Yes",  NULL);
     confirm_items[1] = new_item("No",   NULL);
-    confirm_items[3] = (ITEM *)NULL;
+    confirm_items[2] = (ITEM *)NULL;
     /* -------------------------------- */
 
     /* Create main window for menu */
-    power_menu = new_menu((ITEM **)items);  // Create menu based off items
-    menu_opts_off(power_menu, O_NONCYCLIC); // Force enable menu wrapping
-    menu_opts_off(power_menu, O_SHOWDESC); // Disable item descriptions
-    set_menu_mark(power_menu, ">");         // Set menu marker
-
-    // Create main menu window using size of menu + padding
+    // Create window using size of menu + padding
     menu_window = newwin(option_count + 4, longest_option_char_count + 10, max_y / 2 - option_count, max_x / 2 - longest_option_char_count);
 
     keypad(menu_window, TRUE);
-    box(menu_window, 0, 0);
     /* ---------------------- */
 
     getmaxyx(menu_window, sub_max_y, sub_max_x);    // Get size of main menu window
@@ -236,6 +232,14 @@ int main(int argc, char *argv[]) {
 
     // Create derived window in the middle of the main window
     menu_subwin = derwin(menu_window, 0, 0, sub_max_y / 4, sub_max_x / 4);
+    set_menu_sub(power_menu, menu_subwin);              // Set power menu subwindow
+
+    WINDOW *confirm_menu_subwin = derwin(menu_window, 0, 0, sub_max_y / 4, sub_max_x / 4);
+    confirm_menu = new_menu((ITEM **)confirm_items);
+
+    set_menu_win(confirm_menu, menu_window);
+    set_menu_sub(confirm_menu, confirm_menu_subwin);
+    keypad(confirm_menu_subwin, TRUE);
 
     if(TEST_MODE) {
         printw("TEST MODE");
@@ -243,52 +247,33 @@ int main(int argc, char *argv[]) {
     }
 
     while (!choice_confirmed) {
+        box(menu_window, 0, 0);
         mvwprintw(menu_window, 0, 2, "pmenu %s", version);  // Window titlebar
-        set_menu_sub(power_menu, menu_subwin);              // Set power menu subwindow
         post_menu(power_menu);                              // Display power menu
 
-        selected_option_index = get_user_selection_index(menu_window, power_menu); // Handle input
-        if(selected_option_index == 3) { choice_confirmed = true; }
+        selected_option_index = get_user_selection_index(menu_window, power_menu);  // Handle input for main menu
+        if(selected_option_index == 3) { choice_confirmed = true; }                 // If cancel then confirm
 
-        // TODO Add confirmation dialogue
+        unpost_menu(power_menu);
+
         /* Confirmation */
-        /*
-           if (!NO_CONFIRM) {
-        /*
-        WINDOW *confirm_menu_subwin = derwin(menu_window, 0, 0, sub_max_y / 4, sub_max_x / 4);
-        unpost_menu(power_menu);
-
-
-        unpost_menu(power_menu);
-        clear();
-        /*
-        set_menu_items(power_menu, confirm_items);
-        post_menu(power_menu);
-        */
-        /*
-           wrefresh(menu_window);
-
-           confirm_menu = new_menu((ITEM **)items);
-           set_menu_win(confirm_menu, menu_window);
-           set_menu_sub(confirm_menu, confirm_menu_subwin);
-           post_menu(confirm_menu);
-
-           get_user_selection_index(menu_window, confirm_menu);
-
-           }
-           */
-        /* ------------ */
-
-        // TEMP ENABLE NO_CONFIRM UNTIL FEATURE IS COMPLETE
-        NO_CONFIRM = true;
         if (NO_CONFIRM) { choice_confirmed = true; }
+
+        if (!choice_confirmed) {
+            post_menu(confirm_menu);
+
+            if (get_user_selection_index(confirm_menu_subwin, confirm_menu) == 0) {
+                choice_confirmed = true;
+            }
+        }
+        /* ------------ */
     }
 
     endwin();
 
     /* Handle selected menu option */
     switch (selected_option_index) {
-        case 0: // Shutdown
+        case 0:
             printf("Shutting down...\n");
             if (TEST_MODE) { return 0; }
 
@@ -299,11 +284,11 @@ int main(int argc, char *argv[]) {
             system("shutdown -p now");
 #endif
             break;
-        case 1: // Reboot
+        case 1:
             printf("Rebooting...\n");
             if (TEST_MODE) { return 0; }
 
-            system("shutdown -r now");      // Works for both Linux and BSD
+            system("shutdown -r now"); // Works for both Linux and BSD
             break;
         case 2: // Suspend
             printf("Suspending...\n");
@@ -325,11 +310,12 @@ int main(int argc, char *argv[]) {
             system("zzz");
 #endif
             break;
-        case 3: // Cancel
+        case 3:
             cancel_and_exit();
     }
     /* --------------------------- */
 
+    cleanup();
     return 0;
 }
 
