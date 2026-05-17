@@ -246,6 +246,7 @@ int main(int argc, char *argv[]) {
         refresh();
     }
 
+    // TODO Fix confirm subwindow
     while (!choice_confirmed) {
         box(menu_window, 0, 0);
         mvwprintw(menu_window, 0, 2, "pmenu %s", version);  // Window titlebar
