@@ -5,6 +5,8 @@
 #include <ncurses.h>
 #include <menu.h>
 
+#include "pmenu.h"
+
 // Flags
 bool TEST_MODE, NUM_SELECT, DISPLAY_HORIZONTAL, NO_CONFIRM = false;
 
@@ -19,7 +21,7 @@ bool TEST_MODE, NUM_SELECT, DISPLAY_HORIZONTAL, NO_CONFIRM = false;
 /* Declare global variables */
 int selected_option_index   = 3;    // Default to 3 for cancel
 
-int i, input, max_x, max_y, sub_max_x, sub_max_y = 0;
+int i, input, max_x, max_y, menu_win_max_x, menu_win_max_y = 0;
 
 char *options[]                 = { "Shutdown", "Reboot", "Suspend", "Cancel" };
 int option_count                = sizeof(options) / sizeof(char *);
@@ -76,18 +78,6 @@ void cancel_and_exit() {
     exit(0);
 }
 
-void show_help_message() {
-    printf("Valid arguments:\n"
-            "     --help\t\tShow this help message.\n"
-            "  -d --noconfirm\tDisable confirmation window.\n"
-            "  -s --num-select\tEnable number key usage for menu options.\n"
-            "  -t --testing\t\tEnable testing mode (disables actual menu functions).\n"
-            "  -v --version\t\tShow current version.\n"
-            "\nNot yet implemented (planned):\n"
-            "  -h --horizontal\tSet menu to display horizontally rather than vertically.\n"
-            "  -n --show-nums\tDisplay numbers before menu entries\n");
-}
-
 int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_interface_with) {
     menu_driver(menu_to_interface_with, REQ_FIRST_ITEM);
 
@@ -134,7 +124,6 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
 void set_flags(int argc, char *argv[]) {
     // TODO Match exact input to prevent cases like "-help" enabling DISPLAY_HORIZONTAL
 
-    /* Handle command line args */
     for (i = 1; i < argc; ++i) { // Start 'i' at 1 because argv[0] = current binary path
         if (strstr(argv[i], "--help")) {
             show_help_message();
@@ -165,15 +154,6 @@ void set_flags(int argc, char *argv[]) {
             exit(0);
         }
     }
-
-    /* ------------------------ */
-
-    /* Print args for dev purposes */
-    printf("argc is: %d\n", argc);
-    for (i = 0; i < argc; ++i) {
-        printf("Argv[%i]: %s\n", i, argv[i]);
-    }
-    /* --------------------------- */
 }
 
 int main(int argc, char *argv[]) {
@@ -189,6 +169,7 @@ int main(int argc, char *argv[]) {
     /* Initialise ncurses */
     set_escdelay(50); // Set delay for escape key
     initscr();
+    curs_set(0);
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
@@ -213,12 +194,17 @@ int main(int argc, char *argv[]) {
     set_menu_mark(power_menu, ">");         // Set menu marker
     /* ------------------------------------ */
 
-    /* Create confirmation menu options */
+    /* Create confirmation menu */
     confirm_items = calloc(3, sizeof(ITEM *));
     confirm_items[0] = new_item("Yes",  NULL);
     confirm_items[1] = new_item("No",   NULL);
     confirm_items[2] = (ITEM *)NULL;
-    /* -------------------------------- */
+
+    confirm_menu = new_menu((ITEM **)confirm_items);
+    menu_opts_off(confirm_menu, O_NONCYCLIC); // Force enable menu wrapping
+    menu_opts_off(confirm_menu, O_SHOWDESC);  // Disable item descriptions
+    set_menu_mark(confirm_menu, ">");         // Set menu marker
+    /* ------------------------ */
 
     /* Create main window for menu */
     // Create window using size of menu + padding
@@ -227,15 +213,15 @@ int main(int argc, char *argv[]) {
     keypad(menu_window, TRUE);
     /* ---------------------- */
 
-    getmaxyx(menu_window, sub_max_y, sub_max_x);    // Get size of main menu window
-    set_menu_win(power_menu, menu_window);          // Assign power menu to the main menu window
+    getmaxyx(menu_window, menu_win_max_y, menu_win_max_x);  // Get size of main menu window
+    set_menu_win(power_menu, menu_window);                  // Assign power menu to the main menu window
 
     // Create derived window in the middle of the main window
-    menu_subwin = derwin(menu_window, 0, 0, sub_max_y / 4, sub_max_x / 4);
-    set_menu_sub(power_menu, menu_subwin);              // Set power menu subwindow
+    menu_subwin = derwin(menu_window, 0, 0, menu_win_max_y / 4, menu_win_max_x / 4);
+    set_menu_sub(power_menu, menu_subwin); // Set power menu subwindow
 
-    WINDOW *confirm_menu_subwin = derwin(menu_window, 0, 0, sub_max_y / 4, sub_max_x / 4);
-    confirm_menu = new_menu((ITEM **)confirm_items);
+    // TODO Fix confirm subwindow positioning
+    WINDOW *confirm_menu_subwin = derwin(menu_window, 0, 0, menu_win_max_y / 4, menu_win_max_x / 3 + 1);
 
     set_menu_win(confirm_menu, menu_window);
     set_menu_sub(confirm_menu, confirm_menu_subwin);
@@ -246,7 +232,6 @@ int main(int argc, char *argv[]) {
         refresh();
     }
 
-    // TODO Fix confirm subwindow
     while (!choice_confirmed) {
         box(menu_window, 0, 0);
         mvwprintw(menu_window, 0, 2, "pmenu %s", version);  // Window titlebar
@@ -256,12 +241,14 @@ int main(int argc, char *argv[]) {
         if(selected_option_index == 3) { choice_confirmed = true; }                 // If cancel then confirm
 
         unpost_menu(power_menu);
+        wrefresh(menu_window);
 
         /* Confirmation */
         if (NO_CONFIRM) { choice_confirmed = true; }
 
         if (!choice_confirmed) {
             post_menu(confirm_menu);
+            box(menu_window, 0, 0); // Re-draw box around main window
 
             if (get_user_selection_index(confirm_menu_subwin, confirm_menu) == 0) {
                 choice_confirmed = true;

@@ -30,6 +30,8 @@
                   ./CMakeLists.txt
                   ./src/version.txt
                   ./src/main.c
+                  ./src/pmenu.h
+                  ./src/pmenu.c
               ];
             };
 
