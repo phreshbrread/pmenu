@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
     set_menu_sub(power_menu, menu_subwin); // Set power menu subwindow
 
     // TODO Fix confirm subwindow positioning
-    confirm_menu_subwin = derwin(menu_window, 0, 0, menu_win_max_y / 4, menu_win_max_x / 3 + 1);
+    confirm_menu_subwin = derwin(menu_window, 0, 0, menu_win_max_y / 4, menu_win_max_x / 3 - 2);
 
     set_menu_win(confirm_menu, menu_window);
     set_menu_sub(confirm_menu, confirm_menu_subwin);
@@ -93,8 +93,9 @@ int main(int argc, char *argv[]) {
 
     while (!choice_confirmed) {
         box(menu_window, 0, 0);
-        mvwprintw(menu_window, 0, 2, "pmenu %s", version);  // Window titlebar
-        post_menu(power_menu);                              // Display power menu
+
+        mvwprintw(menu_window, 0, 2, "pmenu %s", version);    // Window title
+        post_menu(power_menu);                                // Display power menu
 
         selected_option_index = get_user_selection_index(menu_window, power_menu);  // Handle input for main menu
         if(selected_option_index == 3) { choice_confirmed = true; }                 // If cancel then confirm
@@ -108,6 +109,8 @@ int main(int argc, char *argv[]) {
         if (!choice_confirmed) {
             post_menu(confirm_menu);
             box(menu_window, 0, 0); // Re-draw box around main window
+            mvwprintw(menu_window, 0, 2, "Are you sure?");    // Window title
+            wrefresh(menu_window);
 
             if (get_user_selection_index(confirm_menu_subwin, confirm_menu) == 0) {
                 choice_confirmed = true;
