@@ -39,6 +39,7 @@ const char version[] = {
 /* --------------------- */
 
 void show_help_message() {
+    printf("Usage: pmenu [OPTIONS]...\n");
     printf("Valid arguments:\n"
             "     --help\t\tShow this help message.\n"
             "  -d --noconfirm\tDisable confirmation window.\n"
