@@ -170,7 +170,7 @@ int main(int argc, char *argv[]) {
 #endif
             break;
         case 3:
-            break;
+            cancel_and_exit(EXIT_SUCCESS);
     }
     /* --------------------------- */
 
