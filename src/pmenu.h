@@ -24,7 +24,7 @@ void show_help_message();
 
 void cleanup();
 
-void cancel_and_exit();
+void cancel_and_exit(int exit_code);
 
 int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_interface_with);
 

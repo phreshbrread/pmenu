@@ -73,11 +73,11 @@ void cleanup() {
     delwin(menu_window);
 }
 
-void cancel_and_exit() {
+void cancel_and_exit(int exit_code) {
     cleanup();
     endwin();
     printf("Cancelled.\n");
-    exit(0);
+    exit(exit_code);
 }
 
 int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_interface_with) {
@@ -104,7 +104,7 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
                 menu_driver(menu_to_interface_with, REQ_NEXT_ITEM);
                 break;
             case 27: // 27 is the raw value of ESC since there is no KEY macro
-                cancel_and_exit();
+                cancel_and_exit(EXIT_SUCCESS);
             case 49: // Raw value for '1'
                 if (NUM_SELECT) { return 0; }
             case 50: // Raw value for '2'
@@ -112,7 +112,7 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
             case 51: // Raw value for '3'
                 if (NUM_SELECT) { return 2; }
             case 52: // Raw value for '4'
-                if (NUM_SELECT) { cancel_and_exit(); }
+                if (NUM_SELECT) { cancel_and_exit(EXIT_SUCCESS); }
         }
 
         if (enter_pressed) { break; } // Break free of while loop
@@ -129,7 +129,7 @@ void set_flags(int argc, char *argv[]) {
     for (int i = 1; i < argc; ++i) { // Start 'i' at 1 because argv[0] = current binary path
         if (strstr(argv[i], "--help")) {
             show_help_message();
-            exit(0);
+            exit(EXIT_SUCCESS);
         }
         else if (strstr(argv[i], "-v") || strstr(argv[i], "--version")) {
             printf("pmenu version %s\n", version);

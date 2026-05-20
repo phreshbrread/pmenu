@@ -79,7 +79,6 @@ int main(int argc, char *argv[]) {
     menu_subwin = derwin(menu_window, 0, 0, menu_win_max_y / 4, menu_win_max_x / 4);
     set_menu_sub(power_menu, menu_subwin); // Set power menu subwindow
 
-    // TODO Fix confirm subwindow positioning
     confirm_menu_subwin = derwin(menu_window, 0, 0, menu_win_max_y / 4, menu_win_max_x / 3 - 2);
 
     set_menu_win(confirm_menu, menu_window);
@@ -125,24 +124,32 @@ int main(int argc, char *argv[]) {
     switch (selected_option_index) {
         case 0:
             printf("Shutting down...\n");
-            if (TEST_MODE) { return 0; }
+            if (TEST_MODE) { return EXIT_SUCCESS; }
 
 #if defined(PLATFORM_LINUX)
-            // TODO Try several different shutdown options since Gentoo and Guix use different commands
-            system("shutdown -P now");
+            if (system("shutdown -P now > /dev/null 2>&1") == 0) {          // Works for most distros
+                break;
+            } else if (system("shutdown -h now > /dev/null 2>&1") == 0) {   // Gentoo
+                break;
+            } else if (system("herd power-off root") == 0) {                // Guix
+                break;
+            } else {
+                printf("Failed to shut down\n");
+                return EXIT_FAILURE;
+            }
 #elif defined(PLATFORM_BSD)
             system("shutdown -p now");
 #endif
             break;
         case 1:
             printf("Rebooting...\n");
-            if (TEST_MODE) { return 0; }
+            if (TEST_MODE) { return EXIT_SUCCESS; }
 
             system("shutdown -r now"); // Works for both Linux and BSD
             break;
         case 2: // Suspend
             printf("Suspending...\n");
-            if (TEST_MODE) { return 0; }
+            if (TEST_MODE) { return EXIT_SUCCESS; }
 
 #if defined(PLATFORM_LINUX)
             /* Try several ways of suspending */
@@ -153,7 +160,9 @@ int main(int argc, char *argv[]) {
             } else if (system("pm-suspend > /dev/null 2>&1") == 0) {
                 break;
             } else {
+                cleanup();
                 printf("Suspend not supported\n");
+                return EXIT_FAILURE;
             }
             /* ------------------------------ */
 #elif defined(PLATFORM_BSD)
@@ -161,15 +170,14 @@ int main(int argc, char *argv[]) {
 #endif
             break;
         case 3:
-            cancel_and_exit();
+            break;
     }
     /* --------------------------- */
 
     cleanup();
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 /* Extra TODO:
  * - Properly refresh window so resizing doesn't break it
- * - Add Windows support
- * - Allow for configuration options */
+ * - Add Windows support */
