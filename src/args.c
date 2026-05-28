@@ -44,7 +44,7 @@ void set_flags(int argc, char **argv) {
         }
     }
 
-    if (argc > 1 && activated_flags == 0) {
+    if (argc > 1 && activated_flags != argc - 1) {
         show_help_message();
         exit(EXIT_FAILURE);
     }
