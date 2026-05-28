@@ -9,27 +9,22 @@
 
 // Args
 Argument valid_args[] = {
-    { "",       "--help",       "Show this help message.",                      false },
-    { "-d",     "--noconfirm",  "Disable confirmation window.",                 false },
-    { "-s",     "--num-select", "Enable number key usage for menu options.",    false },
-    { "-t",     "--testing",    "Disable menu functions.",                      false },
-    { "-v",     "--version",    "Show current version.",                        false },
-    { "-n",     "--show-nums",  "Display numbers before menu entries.",         false },
+    { "  ",     "--help      ",  "Show this help message.",                      false },
+    { "-d",     "--noconfirm ",  "Disable confirmation window.",                 false },
+    { "-s",     "--num-select",  "Enable number key usage for menu options.",    false },
+    { "-t",     "--testing   ",  "Disable menu functions.",                      false },
+    { "-v",     "--version   ",  "Show current version.",                        false },
+    //{ "-n",     "--show-nums ",  "Display numbers before menu entries.",         false },
 };
 
 int valid_args_count = sizeof(valid_args) / sizeof(valid_args[0]);
 
-// TODO Base output off of valid_args[]
 void show_help_message() {
     printf("Usage: pmenu [OPTIONS]...\n");
-    printf("Valid arguments:\n"
-            "     --help\t\tShow this help message.\n"
-            "  -d --noconfirm\tDisable confirmation window.\n"
-            "  -s --num-select\tEnable number key usage for menu options.\n"
-            "  -t --testing\t\tEnable testing mode (disables actual menu functions).\n"
-            "  -v --version\t\tShow current version.\n"
-            "\nNot yet implemented (planned):\n"
-            "  -n --show-nums\tDisplay numbers before menu entries\n");
+    printf("Valid arguments:\n");
+    for (int i = 0; i < valid_args_count; ++i) {
+        printf("\t%s\t%s\t%s\n", valid_args[i].shorthand, valid_args[i].longhand, valid_args[i].description);
+    };
 }
 
 void set_flags(int argc, char **argv) {
