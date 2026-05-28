@@ -2,7 +2,6 @@
 #define PMENU_H
 
 /* Variables */
-extern bool TEST_MODE, NUM_SELECT, DISPLAY_HORIZONTAL, NO_CONFIRM;
 extern bool enter_pressed, choice_confirmed;
 
 extern int input, max_x, max_y, menu_win_max_x, menu_win_max_y, selected_option_index, option_count, longest_option_char_count;

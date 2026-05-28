@@ -6,6 +6,7 @@
 #include <menu.h>
 
 #include "pmenu.h"
+#include "args.h"
 
 /* Determine platform at compilation */
 #if defined(__linux__)
@@ -18,6 +19,16 @@
 int main(int argc, char *argv[]) {
     if (argc > 1) {
         set_flags(argc, argv);
+    }
+
+    if (SHOW_HELP) {
+        show_help_message();
+        exit(EXIT_SUCCESS);
+    }
+
+    if (SHOW_VERSION) {
+        printf("pmenu version %s\n", version);
+        exit(EXIT_SUCCESS);
     }
 
     /* Get length of longest option */

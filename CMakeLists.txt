@@ -9,8 +9,9 @@ set(CURSES_NEED_NCURSES TRUE)
 find_library(CURSES_MENU_LIBRARY menu)
 find_package(Curses REQUIRED)
 
-# Add local library
-add_library(pmenu-lib STATIC src/pmenu.c)
+# Add local libraries
+add_library(pmenu-lib STATIC src/pmenu.c src/args.c)
+#add_library(pmenu-lib STATIC src/args.c)
 
 # Create executable
 add_executable(pmenu src/main.c)
