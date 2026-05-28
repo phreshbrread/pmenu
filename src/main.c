@@ -156,7 +156,10 @@ int main(int argc, char *argv[]) {
             printf("Rebooting...\n");
             if (TEST_MODE) { return EXIT_SUCCESS; }
 
-            system("shutdown -r now"); // Works for both Linux and BSD
+            if (system("shutdown -r now > /dev/null 2>&1") != 0) { // Works for both Linux and BSD
+                printf("Failed to reboot\n");
+                exit(EXIT_FAILURE);
+            };
             break;
         case 2: // Suspend
             printf("Suspending...\n");
