@@ -32,7 +32,6 @@ int main(int argc, char *argv[]) {
     }
 
     /* Get length of longest option */
-    // TODO Un-hardcode this
     longest_option_char_count = strlen(options[0]); // Get length of longest menu option
     /* ---------------------------- */
 
@@ -46,8 +45,6 @@ int main(int argc, char *argv[]) {
     /* ------------------ */
 
     getmaxyx(stdscr, max_y, max_x); // Get size of terminal window
-
-    // TODO Allow for mouse usage
 
     // Allocate memory for array of pointers to ITEM, zero-initialising everything so the last item is NULL
     items = calloc(option_count + 1, sizeof(ITEM *));
@@ -191,7 +188,3 @@ int main(int argc, char *argv[]) {
     cleanup();
     return EXIT_SUCCESS;
 }
-
-/* Extra TODO:
- * - Properly refresh window so resizing doesn't break it
- * - Add Windows support */
