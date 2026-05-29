@@ -28,12 +28,7 @@
               root = ./.;
               fileset = fs.unions [
                   ./CMakeLists.txt
-                  ./src/version.txt
-                  ./src/main.c
-                  ./src/pmenu.h
-                  ./src/pmenu.c
-                  ./src/args.c
-                  ./src/args.h
+                  ./src
               ];
             };
 
