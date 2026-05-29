@@ -19,6 +19,8 @@ extern MEVENT mouse_event;
 /* -------------- */
 
 /* Functions */
+int get_longest_option_char_count();
+
 void show_help_message();
 
 void cleanup();

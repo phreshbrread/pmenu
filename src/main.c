@@ -31,9 +31,8 @@ int main(int argc, char *argv[]) {
         exit(EXIT_SUCCESS);
     }
 
-    /* Get length of longest option */
-    longest_option_char_count = strlen(options[0]); // Get length of longest menu option
-    /* ---------------------------- */
+    // Get length of longest menu option
+    longest_option_char_count = get_longest_option_char_count();
 
     /* Initialise ncurses */
     set_escdelay(50); // Set delay for escape key
