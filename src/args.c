@@ -9,11 +9,11 @@
 
 // Args
 Argument valid_args[] = {
-    { "  ",     "--help      ",  "Show this help message.",                      false },
-    { "-d",     "--noconfirm ",  "Disable confirmation window.",                 false },
-    { "-s",     "--num-select",  "Enable number key usage for menu options.",    false },
-    { "-t",     "--testing   ",  "Disable menu functions.",                      false },
-    { "-v",     "--version   ",  "Show current version.",                        false },
+    { "  ",     "--help",       "Show this help message.",                      false },
+    { "-d",     "--noconfirm",  "Disable confirmation window.",                 false },
+    { "-s",     "--num-select", "Enable number key usage for menu options.",    false },
+    { "-t",     "--testing",    "Disable menu functions.",                      false },
+    { "-v",     "--version",    "Show current version.",                        false },
     //{ "-n",     "--show-nums ",  "Display numbers before menu entries.",         false },
 };
 
@@ -23,7 +23,7 @@ void show_help_message() {
     printf("Usage: pmenu [OPTIONS]...\n");
     printf("Valid arguments:\n");
     for (int i = 0; i < valid_args_count; ++i) {
-        printf("\t%s\t%s\t%s\n", valid_args[i].shorthand, valid_args[i].longhand, valid_args[i].description);
+        printf("   %-3s\t%-15s %s\n", valid_args[i].shorthand, valid_args[i].longhand, valid_args[i].description);
     };
 }
 
