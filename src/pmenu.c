@@ -106,16 +106,22 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
             case 'l':
                 menu_driver(menu_to_interface_with, REQ_NEXT_ITEM);
                 break;
-            case 27: // 27 is the raw value of ESC since there is no KEY macro
-                cancel_and_exit(EXIT_SUCCESS);
             case '1':
                 if (NUM_SELECT) { return 0; }
+                break;
             case '2':
                 if (NUM_SELECT) { return 1; }
+                break;
             case '3':
+                if (menu_to_interface_with == confirm_menu) { break; }
                 if (NUM_SELECT) { return 2; }
+                break;
             case '4':
-                if (NUM_SELECT) { cancel_and_exit(EXIT_SUCCESS); }
+                if (menu_to_interface_with == confirm_menu) { break; }
+                if (NUM_SELECT) { return 3; }
+                break;
+            case 27: // 27 is the raw value of ESC since there is no KEY macro
+                return 3;
         }
 
         if (enter_pressed) { break; } // Break free of while loop
