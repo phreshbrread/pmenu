@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 #include <ncurses.h>
 #include <menu.h>
@@ -121,6 +120,9 @@ int main(int argc, char *argv[]) {
             if (get_user_selection_index(confirm_menu_subwin, confirm_menu) == 0) {
                 choice_confirmed = true;
             }
+
+            unpost_menu(confirm_menu);
+            wrefresh(menu_window);
         }
         /* ------------ */
     }

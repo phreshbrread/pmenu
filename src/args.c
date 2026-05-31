@@ -44,5 +44,3 @@ void set_flags(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 }
-
-

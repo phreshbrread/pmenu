@@ -11,13 +11,13 @@
 int input, max_x, max_y, menu_win_max_x, menu_win_max_y = 0;
 
 /* Declare global variables */
-int selected_option_index       = 3;    // Default to 3 for cancel
+int     selected_option_index       = 3;    // Default to 3 for cancel
 
 char    *options[]                  = { "Shutdown", "Reboot", "Suspend", "Cancel" };
 int     option_count                = sizeof(options) / sizeof(char *);
 int     longest_option_char_count   = 0;
 
-bool enter_pressed, choice_confirmed = false;
+bool    enter_pressed, choice_confirmed = false;
 /* ------------------------ */
 
 /* Declare menu variables */
@@ -108,13 +108,13 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
                 break;
             case 27: // 27 is the raw value of ESC since there is no KEY macro
                 cancel_and_exit(EXIT_SUCCESS);
-            case 49: // Raw value for '1'
+            case '1':
                 if (NUM_SELECT) { return 0; }
-            case 50: // Raw value for '2'
+            case '2':
                 if (NUM_SELECT) { return 1; }
-            case 51: // Raw value for '3'
+            case '3':
                 if (NUM_SELECT) { return 2; }
-            case 52: // Raw value for '4'
+            case '4':
                 if (NUM_SELECT) { cancel_and_exit(EXIT_SUCCESS); }
         }
 
