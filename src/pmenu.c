@@ -44,9 +44,7 @@ int get_longest_option_char_count() {
     for (int i = 0; i < option_count; ++i) { // For each option
         current = strlen(options[i]);
 
-        if (current > longest) {
-            longest = current;
-        }
+        if (current > longest) { longest = current; }
     }
 
     return longest;
