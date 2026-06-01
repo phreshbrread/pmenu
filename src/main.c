@@ -42,6 +42,9 @@ int main(int argc, char *argv[]) {
     keypad(stdscr, TRUE);
     /* ------------------ */
 
+    // Listen for mouse events
+    mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
+
     getmaxyx(stdscr, max_y, max_x); // Get size of terminal window
 
     // Allocate memory for array of pointers to ITEM, zero-initialising everything so the last item is NULL

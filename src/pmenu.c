@@ -87,6 +87,7 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
     /* Handle input */
     while ((input = wgetch(window_to_interface_with))) {
         switch (input) {
+            /* Keyboard inputs */
             case '\n':
             case '\r':
             case KEY_ENTER:
@@ -118,9 +119,39 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
                 if (menu_to_interface_with == confirm_menu) { break; }
                 if (NUM_SELECT) { return 3; }
                 break;
-            case 27: // 27 is the raw value of ESC since there is no KEY macro
+            case 27: // 27 is the raw value of ESC
                 return 3;
+                break;
+                /* --------------- */
+
+                /* Mouse inputs */
+            case KEY_MOUSE:
+                if(getmouse(&mouse_event) == OK) {
+                    int local_y = mouse_event.y;
+                    int local_x = mouse_event.x;
+
+                    // Get mouse position relative to subwindow
+                    if (wmouse_trafo(menu_subwin, &local_y, &local_x, FALSE)) {
+                        if(mouse_event.bstate & BUTTON1_CLICKED) {
+                            switch (local_y) {
+                                case 0:
+                                    return 0;
+                                    break;
+                                case 1:
+                                    return 1;
+                                    break;
+                                case 2:
+                                    return 2;
+                                    break;
+                                case 3:
+                                    return 3;
+                                    break;
+                            }
+                        }
+                    }
+                }
         }
+        /* ------------ */
 
         if (enter_pressed) { break; } // Break free of while loop
     }
