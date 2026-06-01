@@ -32,7 +32,7 @@ Then, in your ``configuration.nix`` (or wherever else your package lists are):
 - ncurses
 
 ### With nix
-Simply run ``nix build`` or ``nix run`` to build according to the included flake.nix
+Simply run ``nix build`` or ``nix run`` to build according to the included ``flake.nix``
 
 ### Manual build
 Run the following to build using cmake:
