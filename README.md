@@ -10,8 +10,8 @@ Example: ``kitty -T pmenu -o font_size=16 pmenu``
 Run ``pmenu --help`` to view valid cmd arguments
 
 ## Install
-Currently there are no pre-built binaries. Manual installation is required on normal distros.
-On Nix, this repo can be added as a custom package though.
+### Nix
+This repo can be added as a custom package.
 To do so, include the following in your ``flake.nix``:
 ```
     inputs = {
@@ -27,15 +27,24 @@ Then, in your ``configuration.nix`` (or wherever else your package lists are):
     ];
 ```
 
+### Everything else
+There are currently no prebuilt binaries.
+To install, simply run ``cmake-install.sh`` in ``scripts/`` to build and install.
+Alternatively, manually run the following:
+```
+    mkdir -p build && cmake -B build && cmake --build build && cmake --install build
+```
+
 ## Building
 ### Dependencies
+- cmake
 - ncurses
 
 ### With nix
-Simply run ``nix build`` or ``nix run`` to build according to the included ``flake.nix``
+Simply run ``nix build`` to build according to the included ``flake.nix``
 
 ### Manual build
-Run the following to build using cmake:
+Run ``cmake-build.sh`` in the ``script/`` directory, or manually run the following:
 ```
     mkdir -p build && cmake -B build && cmake --build build
 ```
