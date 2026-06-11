@@ -6,11 +6,12 @@ TUI-based power menu written in C for Linux and BSD systems.
 </p>
 
 ## Usage
-Simply run from a terminal.
-I recommend setting a keybind to open and execute at the same time.<br>
-Example: ``kitty -T pmenu -o font_size=16 pmenu``
+Simply run from a terminal.<br>
+Menu options can be selected using the arrow keys, hjkl, or mouse clicks.<br>
+Run ``pmenu --help`` to view valid cmd arguments.
 
-Run ``pmenu --help`` to view valid cmd arguments
+To have this act like a standard power prompt, I recommend setting a keybind to open and run in a new terminal.<br>
+Example: ``kitty -T pmenu -o font_size=16 pmenu``
 
 ## Install
 ### Nix
