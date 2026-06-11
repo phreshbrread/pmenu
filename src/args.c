@@ -13,9 +13,8 @@ Argument valid_args[] = {
     { "-d",     "--noconfirm",      "Disable confirmation window.",                 false }, // 1
     { "-s",     "--num-select",     "Enable number key usage for menu options.",    false }, // 2
     { "-t",     "--testing",        "Disable menu functions.",                      false }, // 3
-    { "-c",     "--single-click",   "Confirm menu option with a single click",      false }, // 4
-    { "-v",     "--version",        "Show current version.",                        false }, // 5
-    //{ "-n",     "--show-nums ",  "Display numbers before menu entries.",         false }, // 6
+    { "-v",     "--version",        "Show current version.",                        false }, // 4
+    //{ "-n",     "--show-nums ",  "Display numbers before menu entries.",         false }, // 5
 };
 
 int valid_args_count = sizeof(valid_args) / sizeof(valid_args[0]);

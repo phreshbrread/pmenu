@@ -134,27 +134,8 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
                 // Get mouse position relative to subwindow
                 if (!wmouse_trafo(menu_subwin, &local_y, &local_x, FALSE)) { break; }
 
-                // Single click to highlight option
-                if(!(mouse_event.bstate & BUTTON1_CLICKED)) { /* Continue if not single click */ }
-                switch (local_y) {
-                    case 0:
-                        set_current_item(menu_to_interface_with, menu_to_interface_with->items[0]);
-                        break;
-                    case 1:
-                        set_current_item(menu_to_interface_with, menu_to_interface_with->items[1]);
-                        break;
-                    case 2:
-                        if (menu_to_interface_with == confirm_menu) { break; }
-                        set_current_item(menu_to_interface_with, menu_to_interface_with->items[2]);
-                        break;
-                    case 3:
-                        if (menu_to_interface_with == confirm_menu) { break; }
-                        set_current_item(menu_to_interface_with, menu_to_interface_with->items[3]);
-                        break;
-                }
-
-                // Double click to activate menu option
-                if(!(mouse_event.bstate & BUTTON1_DOUBLE_CLICKED)) { break; }
+                // Click to activate menu option
+                if(!(mouse_event.bstate & BUTTON1_CLICKED)) { break; }
                 switch (local_y) {
                     case 0:
                         return 0;
@@ -171,8 +152,8 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
                         return 3;
                         break;
                 }
+                /* ------------ */
         }
-        /* ------------ */
 
         if (enter_pressed) { break; } // Break free of while loop
     }
