@@ -2,7 +2,9 @@
 TUI-based power menu written in C for Linux and BSD systems.
 Handles shutting down, rebooting and suspending.
 
-![pmenu running in a terminal](/img/example.png)
+<p align="center">
+  <img src="/img/example.png" alt="pmenu running in a terminal">
+</p>
 
 ## Usage
 Simply run from a terminal.
