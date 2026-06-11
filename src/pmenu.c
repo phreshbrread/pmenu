@@ -126,31 +126,30 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
 
                 /* Mouse inputs */
             case KEY_MOUSE:
-                if(getmouse(&mouse_event) == OK) {
-                    int local_y = mouse_event.y;
-                    int local_x = mouse_event.x;
+                if(getmouse(&mouse_event) != OK) { break; }
 
-                    // Get mouse position relative to subwindow
-                    if (wmouse_trafo(menu_subwin, &local_y, &local_x, FALSE)) {
-                        if(mouse_event.bstate & BUTTON1_CLICKED) {
-                            switch (local_y) {
-                                case 0:
-                                    return 0;
-                                    break;
-                                case 1:
-                                    return 1;
-                                    break;
-                                case 2:
-                                    if (menu_to_interface_with == confirm_menu) { break; }
-                                    return 2;
-                                    break;
-                                case 3:
-                                    if (menu_to_interface_with == confirm_menu) { break; }
-                                    return 3;
-                                    break;
-                            }
-                        }
-                    }
+                int local_y = mouse_event.y;
+                int local_x = mouse_event.x;
+
+                // Get mouse position relative to subwindow
+                if (!wmouse_trafo(menu_subwin, &local_y, &local_x, FALSE)) { break; }
+
+                if(!(mouse_event.bstate & BUTTON1_CLICKED)) { break; }
+                switch (local_y) {
+                    case 0:
+                        return 0;
+                        break;
+                    case 1:
+                        return 1;
+                        break;
+                    case 2:
+                        if (menu_to_interface_with == confirm_menu) { break; }
+                        return 2;
+                        break;
+                    case 3:
+                        if (menu_to_interface_with == confirm_menu) { break; }
+                        return 3;
+                        break;
                 }
         }
         /* ------------ */
