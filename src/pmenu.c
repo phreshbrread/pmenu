@@ -141,9 +141,11 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
                                     return 1;
                                     break;
                                 case 2:
+                                    if (menu_to_interface_with == confirm_menu) { break; }
                                     return 2;
                                     break;
                                 case 3:
+                                    if (menu_to_interface_with == confirm_menu) { break; }
                                     return 3;
                                     break;
                             }
