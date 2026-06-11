@@ -1,6 +1,5 @@
 # pmenu
 TUI-based power menu written in C for Linux and BSD systems.
-Handles shutting down, rebooting and suspending.
 
 <p align="center">
   <img src="/img/example.png" alt="pmenu running in a terminal">
@@ -8,14 +7,14 @@ Handles shutting down, rebooting and suspending.
 
 ## Usage
 Simply run from a terminal.
-I recommend setting a keybind to open and execute at the same time.
+I recommend setting a keybind to open and execute at the same time.<br>
 Example: ``kitty -T pmenu -o font_size=16 pmenu``
 
 Run ``pmenu --help`` to view valid cmd arguments
 
 ## Install
 ### Nix
-This repo can be added as a custom package.
+This repo can be added as a custom package.<br>
 To do so, include the following in your ``flake.nix``:
 ```
     inputs = {
@@ -23,7 +22,7 @@ To do so, include the following in your ``flake.nix``:
     };
 ```
 
-Make sure the ``nixosConfiguration`` for your system receives this input.
+Make sure the ``nixosConfiguration`` for your system receives this input.<br>
 Then, in your ``configuration.nix`` (or wherever else your package lists are):
 ```
     environment.systemPackages = with pkgs; [
@@ -32,8 +31,8 @@ Then, in your ``configuration.nix`` (or wherever else your package lists are):
 ```
 
 ### Everything else
-There are currently no prebuilt binaries.
-To install, simply run ``cmake-install.sh`` in ``scripts/`` to build and install.
+There are currently no prebuilt binaries.<br>
+To install, simply run ``cmake-install.sh`` in ``scripts/`` to build and install.<br>
 Alternatively, manually run the following:
 ```
     mkdir -p build && cmake -B build && cmake --build build && cmake --install build
