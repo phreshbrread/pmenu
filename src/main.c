@@ -159,11 +159,14 @@ int main(int argc, char *argv[]) {
             printf("Rebooting...\n");
             if (TEST_MODE) { return EXIT_SUCCESS; }
 
-            if (system("shutdown -r now > /dev/null 2>&1") != 0) { // Works for both Linux and BSD
-                printf("Failed to reboot\n");
-                exit(EXIT_FAILURE);
-            };
-            break;
+            if (system("shutdown -r now > /dev/null 2>&1") != 0) { // Works for most Linux distros and BSD
+                break;
+            } else if (system("loginctl reboot > /dev/null 2>&1") != 0) { // For Gentoo
+                break;
+            } else {
+                printf("Failed to shut down\n");
+                return EXIT_FAILURE;
+            }
         case 2: // Suspend
             printf("Suspending...\n");
             if (TEST_MODE) { return EXIT_SUCCESS; }
