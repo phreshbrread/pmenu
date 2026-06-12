@@ -33,7 +33,7 @@ Then, in your ``configuration.nix`` (or wherever else your package lists are):
 
 ## Everything else
 ### Installing
-To install, run ``make install`` (may require superuser permissions).<br>
+To install, simply run ``make install`` (may require superuser permissions).<br>
 Alternatively, if you don't have superuser perms, running ``make install-local`` will install pmenu to ``~/.local/bin/pmenu``
 
 ### Building
@@ -42,5 +42,5 @@ Dependencies:
 - gnumake
 - ncurses
 
-To build, simply run ``make`` to output a binary at ``bin/pmenu``.<br>
+To build, run ``make`` to output a binary at ``bin/pmenu``.<br>
 Object files are created in ``obj/``.
