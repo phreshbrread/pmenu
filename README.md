@@ -33,7 +33,7 @@ Then, in your ``configuration.nix`` (or wherever else your package lists are):
 
 ## Everything else
 ### Building
-#### Dependencies:
+Dependencies:
 - gcc
 - gnumake
 - ncurses
