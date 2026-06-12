@@ -16,7 +16,7 @@
           gcc
           ncurses
           gdb
-          cmake
+          gnumake
         ];
       };
 
@@ -24,18 +24,19 @@
           pmenu = pkgs.stdenv.mkDerivation {
             pname = "pmenu";
             version = "${pkgVersionFromFile}";
-            src = fs.toSource rec {
-              root = ./.;
-              fileset = fs.unions [
-                  ./CMakeLists.txt
-                  ./src
-              ];
-            };
+            src = ./.;
+            #src = fs.toSource rec {
+            #  root = ./.;
+            #  fileset.maybeMissing = fs.unions [
+            #      ./makefile
+            #      ./src
+            #  ];
+            #};
 
             # Needed during build phase
             nativeBuildInputs = with pkgs; [
               gcc # Included in stdenv anyways
-              cmake
+              gnumake
             ];
 
             # Needed during runtime
@@ -43,7 +44,14 @@
               ncurses
             ];
 
-            # Build & Install phases handled by cmake
+            buildPhase = ''
+              make pmenu-linux
+            '';
+
+            installPhase = ''
+              mkdir -p $out/bin
+              cp bin/pmenu $out/bin
+            '';
 
             # Package metadata
             meta = with pkgs.lib; {

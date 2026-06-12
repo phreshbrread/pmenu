@@ -1,6 +1,5 @@
 .direnv/
-output/
-result/
-build/
+bin/
+obj/
 result
 pmenu
