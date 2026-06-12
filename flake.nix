@@ -45,7 +45,7 @@
             ];
 
             buildPhase = ''
-              make pmenu-linux
+              make pmenu
             '';
 
             installPhase = ''
