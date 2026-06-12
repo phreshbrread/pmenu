@@ -35,6 +35,7 @@ install: pmenu-linux
 	@echo "Installed to /usr/local/bin/pmenu"
 
 install-local: pmenu-linux
+	mkdir -p ~/.local/bin/
 	install -m 755 bin/pmenu ~/.local/bin/pmenu
 	@echo "Installed to ~/.local/bin/pmenu"
 
