@@ -7,21 +7,18 @@ CFLAGS = -Wall -Wextra -ltinfo -lmenu -lncurses
 # Define object files
 OBJS = obj/args.o obj/pmenu.o obj/main.o
 
-# Objects require prepare to have been run already
-$(OBJS): | prepare
-
 # Default step when simply running 'make'
 all: pmenu-linux
 
 # Link object files into main executable
-pmenu-linux: $(OBJS)
+pmenu-linux: prepare $(OBJS)
+	@echo "Creating object files..."
 	@echo "Creating binary..."
-	$(CC) $(CFLAGS) -o bin/pmenu obj/args.o obj/pmenu.o obj/main.o
+	$(CC) $(CFLAGS) -o bin/pmenu $(OBJS)
 	@echo "Binary created at ./bin/pmenu"
 
 # Compile c files into object files
 obj/args.o: src/args.c
-	@echo "Creating object files..."
 	$(CC) $(CFLAGS) -c src/args.c -o obj/args.o
 obj/pmenu.o: src/pmenu.c
 	$(CC) $(CFLAGS) -c src/pmenu.c -o obj/pmenu.o
