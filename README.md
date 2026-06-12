@@ -34,9 +34,11 @@ Then, in your ``configuration.nix`` (or wherever else your package lists are):
 ### Everything else
 #### Building
 ##### Dependencies
-- gcc
-- gnumake
-- ncurses
+```
+    - gcc
+    - gnumake
+    - ncurses
+```
 
 To build, simply run ``make`` to output a binary at ``bin/pmenu``.
 
