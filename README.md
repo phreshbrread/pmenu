@@ -32,25 +32,14 @@ Then, in your ``configuration.nix`` (or wherever else your package lists are):
 ```
 
 ### Everything else
-There are currently no prebuilt binaries.<br>
-To install, simply run ``cmake-install.sh`` in ``scripts/`` to build and install.<br>
-Alternatively, manually run the following:
-```
-    mkdir -p build && cmake -B build && cmake --build build && cmake --install build
-```
-
-## Building
-### Dependencies
-- cmake
+#### Building
+##### Dependencies
+- gcc
+- gnumake
 - ncurses
 
-### With nix
-Simply run ``nix build`` to build according to the included ``flake.nix``
+To build, simply run ``make`` to output a binary at ``bin/pmenu``.
 
-### Manual build
-Run ``cmake-build.sh`` in the ``script/`` directory, or manually run the following:
-```
-    mkdir -p build && cmake -B build && cmake --build build
-```
-
-This will output a binary at ``./build/pmenu``
+#### Installing
+To install, simply run ``make install`` (may require superuser permissions).<br>
+Alternatively, if you don't have superuser perms, running ``make install-local`` will install pmenu to ``~/.local/bin/pmenu``

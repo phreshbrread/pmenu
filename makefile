@@ -30,6 +30,14 @@ prepare:
 	@echo "Creating build directories..."
 	@mkdir -p bin/ obj/
 
+install: pmenu-linux
+	install -m 755 bin/pmenu /usr/local/bin/pmenu
+	@echo "Installed to /usr/local/bin/pmenu"
+
+install-local: pmenu-linux
+	install -m 755 bin/pmenu ~/.local/bin/pmenu
+	@echo "Installed to ~/.local/bin/pmenu"
+
 # Remove build dirs
 clean:
 	@echo "Removing build directories..."
