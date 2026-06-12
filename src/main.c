@@ -143,6 +143,8 @@ int main(int argc, char *argv[]) {
                 break;
             } else if (system("shutdown -h now > /dev/null 2>&1") == 0) {   // Gentoo
                 break;
+            } else if (system("loginctl poweroff > /dev/null 2>&1") == 0) { // Also Gentoo
+                break;
             } else if (system("herd power-off root") == 0) {                // Guix
                 break;
             } else {
