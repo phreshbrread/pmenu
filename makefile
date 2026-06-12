@@ -8,10 +8,10 @@ CFLAGS = -Wall -Wextra -ltinfo -lmenu -lncurses
 OBJS = obj/args.o obj/pmenu.o obj/main.o
 
 # Default step when simply running 'make'
-all: pmenu-linux
+all: pmenu
 
 # Link object files into main executable
-pmenu-linux: prepare $(OBJS)
+pmenu: prepare $(OBJS)
 	@echo "Creating object files..."
 	@echo "Creating binary..."
 	$(CC) $(CFLAGS) -o bin/pmenu $(OBJS)
@@ -30,11 +30,11 @@ prepare:
 	@echo "Creating build directories..."
 	@mkdir -p bin/ obj/
 
-install: pmenu-linux
+install: pmenu
 	install -m 755 bin/pmenu /usr/local/bin/pmenu
 	@echo "Installed to /usr/local/bin/pmenu"
 
-install-local: pmenu-linux
+install-local: pmenu
 	mkdir -p ~/.local/bin/
 	install -m 755 bin/pmenu ~/.local/bin/pmenu
 	@echo "Installed to ~/.local/bin/pmenu"

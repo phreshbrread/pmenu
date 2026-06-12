@@ -39,7 +39,7 @@ Alternatively, if you don't have superuser perms, running ``make install-local``
 ### Building
 Dependencies:
 - gcc
-- gnumake
+- make (gmake on FreeBSD)
 - ncurses
 
 To build, run ``make`` to output a binary at ``bin/pmenu``.<br>
