@@ -8,7 +8,7 @@
 #include "pmenu.h"
 #include "args.h"
 
-const char version[] = "1.4.1";
+const char version[] = "1.4.2";
 
 int input, max_x, max_y, menu_win_max_x, menu_win_max_y = 0;
 
