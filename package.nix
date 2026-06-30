@@ -46,7 +46,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "TUI power menu for Linux";
     homepage = "https://github.com/phreshbrread/pmenu";
     license = licenses.mit;
-    maintainers = with maintainers; [ phreshbrread ]; # Add yourself to pkgs/maintainers/maintainer-list.nix first!
+    maintainers = with maintainers; [ phreshbrread ];
     platforms = platforms.linux;
     mainProgram = "pmenu";
   };
