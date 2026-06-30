@@ -7,14 +7,9 @@
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
-
-      # Get version from file in src/
-      pkgVersionFromFile = builtins.replaceStrings ["\""] [""] (nixpkgs.lib.fileContents ./src/version.txt);
     in {
       packages.${system} = rec {
-        pmenu = pkgs.callPackage ./package.nix {
-          inherit pkgVersionFromFile;
-        };
+        pmenu = pkgs.callPackage ./package.nix {};
         default = pmenu;
       };
 

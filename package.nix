@@ -1,29 +1,26 @@
-{
-  lib,
+{ lib,
   stdenv,
+  fetchFromGitHub,
   ncurses,
-  gnumake,
-  pkgVersionFromFile,
+  gnumake
 }:
 
-stdenv.mkDerivation {
+stdenv.mkDerivation (finalAttrs: {
   pname = "pmenu";
-  version = pkgVersionFromFile;
+  version = "1.4.2";
 
-  src = lib.fileset.toSource {
-    root = ./.;
-    fileset = lib.fileset.unions [
-      ./makefile
-      ./src
-    ];
+  # Get source from GH repo
+  src = fetchFromGitHub {
+    owner = "phreshbrread";
+    repo = "pmenu";
+    rev = "v${finalAttrs.version}";
+    hash = lib.fakeHash;
   };
 
-  # Needed during build phase
   nativeBuildInputs = [
     gnumake
   ];
 
-  # Needed during runtime
   buildInputs = [
     ncurses
   ];
@@ -45,11 +42,12 @@ stdenv.mkDerivation {
     runHook postInstall
   '';
 
-  # Package metadata
   meta = with lib; {
     description = "TUI power menu for Linux";
     homepage = "https://github.com/phreshbrread/pmenu";
+    license = licenses.mit;
+    maintainers = with maintainers; [ phreshbrread ]; # Add yourself to pkgs/maintainers/maintainer-list.nix first!
     platforms = platforms.linux;
     mainProgram = "pmenu";
   };
-}
+})

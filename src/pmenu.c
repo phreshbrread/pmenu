@@ -8,6 +8,8 @@
 #include "pmenu.h"
 #include "args.h"
 
+const char version[] = "1.4.1";
+
 int input, max_x, max_y, menu_win_max_x, menu_win_max_y = 0;
 
 /* Declare global variables */
@@ -31,12 +33,6 @@ ITEM    **confirm_items;
 MENU    *confirm_menu;
 WINDOW  *confirm_menu_subwin;
 /* ---------------------- */
-
-/* Get version from file */
-const char version[] = {
-#include "version.txt"
-};
-/* --------------------- */
 
 int get_longest_option_char_count() {
     int current, longest = 0;
