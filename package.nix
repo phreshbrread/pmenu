@@ -6,15 +6,15 @@
 }:
 
 stdenv.mkDerivation (finalAttrs: {
-  pname = "pmenu";
-  version = "1.4.2";
+  pname   = "pmenu";
+  version = "1.4.1";
 
   # Get source from GitHub repo
   src = fetchFromGitHub {
     owner = "phreshbrread";
-    repo = "pmenu";
-    rev = "bb5c4e94ccc866472c02c64855eac8c5f37d24a7";
-    hash = "sha256-57w2rfeRlHbH1xRvKkdpYQBM6mfbkTN1HTooTLWJs8c=";
+    repo  = "pmenu";
+    rev   = "v${finalAttrs.version}";
+    hash  = "sha256-57w2rfeRlHbH1xRvKkdpYQBM6mfbkTN1HTooTLWJs8c=";
   };
 
   nativeBuildInputs = [
