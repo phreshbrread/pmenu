@@ -7,63 +7,25 @@
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
+
+      # Get version from file in src/
       pkgVersionFromFile = builtins.replaceStrings ["\""] [""] (nixpkgs.lib.fileContents ./src/version.txt);
-      fs = nixpkgs.lib.fileset;
     in {
-      devShells.${system}.default = pkgs.mkShell {
-        # Tools for use in dev shell
-        buildInputs = with pkgs; [
-          gcc
-          ncurses
-          gdb
-          gnumake
-        ];
+      packages.${system} = rec {
+        pmenu = pkgs.callPackage ./package.nix {
+          inherit pkgVersionFromFile;
+        };
+        default = pmenu;
       };
 
-        packages.${system} = {
-          pmenu = pkgs.stdenv.mkDerivation {
-            pname = "pmenu";
-            version = "${pkgVersionFromFile}";
-            src = ./.;
-            #src = fs.toSource rec {
-            #  root = ./.;
-            #  fileset.maybeMissing = fs.unions [
-            #      ./makefile
-            #      ./src
-            #  ];
-            #};
+      devShells.${system}.default = pkgs.mkShell {
+        # Grab dependencies from package.nix
+        inputsFrom = [ self.packages.${system}.pmenu ];
 
-            # Needed during build phase
-            nativeBuildInputs = with pkgs; [
-              gcc # Included in stdenv anyways
-              gnumake
-            ];
-
-            # Needed during runtime
-            buildInputs = with pkgs; [
-              ncurses
-            ];
-
-            buildPhase = ''
-              make pmenu
-            '';
-
-            installPhase = ''
-              mkdir -p $out/bin
-              cp bin/pmenu $out/bin
-            '';
-
-            # Package metadata
-            meta = with pkgs.lib; {
-              description = "TUI power menu";
-              homepage = "https://github.com/phreshbrread/pmenu";
-              platforms = platforms.linux;
-            };
-          };
-
-          # Make default package when running 'nix run / build'
-          default = self.packages.${system}.pmenu;
-        };
+        # Extra tools just for dev environment
+        nativeBuildInputs = with pkgs; [
+          gdb
+        ];
+      };
     };
 }
-
