@@ -47,7 +47,7 @@ stdenv.mkDerivation {
 
   # Package metadata
   meta = with lib; {
-    description = "TUI power menu";
+    description = "TUI power menu for Linux";
     homepage = "https://github.com/phreshbrread/pmenu";
     platforms = platforms.linux;
     mainProgram = "pmenu";

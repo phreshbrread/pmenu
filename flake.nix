@@ -1,5 +1,5 @@
 {
-  description = "pmenu dev flake";
+  description = "TUI power menu for Linux";
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
 
