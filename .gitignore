@@ -1,5 +1,6 @@
 .direnv/
 bin/
 obj/
+result/
 result
 pmenu
