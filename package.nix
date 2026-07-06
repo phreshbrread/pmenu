@@ -7,7 +7,7 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname   = "pmenu-tui";
-  version = "1.4.2";
+  version = "1.4.3";
 
   # Get source from GitHub repo
   src = fetchFromGitHub {
