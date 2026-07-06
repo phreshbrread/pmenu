@@ -13,11 +13,9 @@ const char version[] = "1.4.3";
 int input, max_x, max_y, menu_win_max_x, menu_win_max_y = 0;
 
 /* Declare global variables */
-int     selected_option_index       = 3;    // Default to 3 for cancel
-
-char    *options[]                  = { "Shutdown", "Reboot", "Suspend", "Cancel" };
-int     option_count                = sizeof(options) / sizeof(char *);
-int     longest_option_char_count   = 0;
+int       selected_option_index     = 3; // Default to 3 for cancel
+const int option_count              = 4; // 4 because array starts at 0
+int       longest_option_char_count = 8;
 
 bool    enter_pressed, choice_confirmed = false;
 /* ------------------------ */
@@ -33,18 +31,6 @@ ITEM    **confirm_items;
 MENU    *confirm_menu;
 WINDOW  *confirm_menu_subwin;
 /* ---------------------- */
-
-int get_longest_option_char_count() {
-    int current, longest = 0;
-
-    for (int i = 0; i < option_count; ++i) { // For each option
-        current = strlen(options[i]);
-
-        if (current > longest) { longest = current; }
-    }
-
-    return longest;
-}
 
 void cleanup() {
     /* Free memory used by main menu */

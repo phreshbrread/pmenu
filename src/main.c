@@ -15,6 +15,21 @@
 #endif
 /* --------------------------------- */
 
+void create_options(char *arr[]) {
+    if (SHOW_NUMS) {
+        arr[0] = "1. Shutdown";
+        arr[1] = "2. Reboot";
+        arr[2] = "3. Suspend";
+        arr[3] = "4. Cancel";
+    } else {
+        arr[0] = "Shutdown";
+        arr[1] = "Reboot";
+        arr[2] = "Suspend";
+        arr[3] = "Cancel";
+    }
+    arr[4] = NULL;
+}
+
 int main(int argc, char *argv[]) {
     if (argc > 1) {
         set_flags(argc, argv);
@@ -30,8 +45,16 @@ int main(int argc, char *argv[]) {
         exit(EXIT_SUCCESS);
     }
 
-    // Get length of longest menu option
-    longest_option_char_count = get_longest_option_char_count();
+    // Create options array
+    char *new_options[4];
+    create_options(new_options);
+
+    // Determine length of longest menu option
+    if (SHOW_NUMS) {
+        longest_option_char_count = 12;
+    } else {
+        longest_option_char_count = 8;
+    }
 
     /* Initialise ncurses */
     set_escdelay(50); // Set delay for escape key
@@ -47,14 +70,14 @@ int main(int argc, char *argv[]) {
 
     getmaxyx(stdscr, max_y, max_x); // Get size of terminal window
 
-    // Allocate memory for array of pointers to ITEM, zero-initialising everything so the last item is NULL
-    items = calloc(option_count + 1, sizeof(ITEM *));
+    // Allocate memory for array of ITEM pointers
+    items = calloc(option_count, sizeof(ITEM *));
 
     /* Create menu items from options array */
     for (int i = 0; i < option_count; ++i) {
-        items[i] = new_item(options[i], options[i]);
+        items[i] = new_item(new_options[i], new_options[i]);
     }
-    items[option_count] = (ITEM *)NULL; // Terminate option list with null pointer
+    items[option_count] = (ITEM *)NULL;     // Null terminate items menu
 
     power_menu = new_menu((ITEM **)items);  // Create menu based off items
     menu_opts_off(power_menu, O_NONCYCLIC); // Force enable menu wrapping
@@ -64,8 +87,13 @@ int main(int argc, char *argv[]) {
 
     /* Create confirmation menu */
     confirm_items = calloc(3, sizeof(ITEM *));
-    confirm_items[0] = new_item("Yes",  NULL);
-    confirm_items[1] = new_item("No",   NULL);
+    if (SHOW_NUMS) {
+        confirm_items[0] = new_item("1. Yes",  NULL);
+        confirm_items[1] = new_item("2. No",   NULL);
+    } else {
+        confirm_items[0] = new_item("Yes",  NULL);
+        confirm_items[1] = new_item("No",   NULL);
+    }
     confirm_items[2] = (ITEM *)NULL;
 
     confirm_menu = new_menu((ITEM **)confirm_items);
