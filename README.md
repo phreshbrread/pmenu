@@ -38,9 +38,8 @@ Alternatively, if you don't have superuser perms, running ``make install-local``
 
 ### Building
 Dependencies:
-- gcc
-- make (gmake on FreeBSD)
-- ncurses
+- ``gcc``
+- ``make`` (``gmake`` on FreeBSD)
+- ``ncurses``
 
-To build, run ``make`` to output a binary at ``bin/pmenu``.<br>
-Object files are created in ``obj/``.
+To build, run ``make`` to output a binary at ``bin/pmenu``.
