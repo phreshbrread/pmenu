@@ -33,7 +33,8 @@ Then, in your ``configuration.nix`` (or wherever else your package lists are):
 
 ## Everything else
 ### Installing
-To install, simply run ``make install`` (may require superuser permissions).<br>
+First, clone the repo with ``git clone https://github.com/phreshbrread/pmenu``<br>
+Then, ``cd`` into the ``pmenu`` directory and run ``make install`` (may require superuser permissions).<br>
 Alternatively, if you don't have superuser perms, running ``make install-local`` will install pmenu to ``~/.local/bin/pmenu``
 
 ### Building
@@ -42,4 +43,4 @@ Dependencies:
 - ``make`` (``gmake`` on FreeBSD)
 - ``ncurses``
 
-To build, run ``make`` to output a binary at ``bin/pmenu``.
+To build, run ``make`` to output a binary at ``./bin/pmenu``
