@@ -8,13 +8,14 @@
 #include "pmenu.h"
 
 // Args
+bool SHOW_HELP, NO_CONFIRM, NUM_SELECT, TEST_MODE, SHOW_VERSION, SHOW_NUMS = false;
 Argument valid_args[] = {
-    { "  ",     "--help",           "Show this help message.",                      false }, // 0
-    { "-d",     "--noconfirm",      "Disable confirmation window.",                 false }, // 1
-    { "-s",     "--num-select",     "Enable number key usage for menu options.",    false }, // 2
-    { "-t",     "--testing",        "Disable menu functions.",                      false }, // 3
-    { "-v",     "--version",        "Show current version.",                        false }, // 4
-    { "-n",     "--show-nums",      "Display numbers before menu entries.",         false }, // 5
+    { "  ",     "--help",           "Show this help message.",                      &SHOW_HELP    },
+    { "-d",     "--noconfirm",      "Disable confirmation window.",                 &NO_CONFIRM   },
+    { "-s",     "--num-select",     "Enable number key usage for menu options.",    &NUM_SELECT   },
+    { "-t",     "--testing",        "Disable menu functions.",                      &TEST_MODE    },
+    { "-v",     "--version",        "Show current version.",                        &SHOW_VERSION },
+    { "-n",     "--show-nums",      "Display numbers before menu entries.",         &SHOW_NUMS    },
 };
 
 int valid_args_count = sizeof(valid_args) / sizeof(valid_args[0]);
@@ -30,10 +31,10 @@ void show_help_message() {
 void set_flags(int argc, char **argv) {
     int activated_flags = 0;
 
-    for (int i = 1; i < argc; ++i) { // For each entry in argv[]
+    for (int i = 1; i < argc; ++i) {                 // For each entry in argv[]
         for (int j = 0; j < valid_args_count; ++j) { // For each valid argument
             if (strcmp(valid_args[j].shorthand, argv[i]) == 0 || strcmp(valid_args[j].longhand, argv[i]) == 0) {
-                valid_args[j].flag_enabled = true;
+                *valid_args[j].flag_enabled = true;
                 ++activated_flags;
             }
         }
