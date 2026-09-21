@@ -1,5 +1,6 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -ltinfo -lmenu -lncurses
+CFLAGS = -Wall -Wextra
+LFLAGS = -ltinfo -lmenu -lncurses
 
 # Run these steps even if a file exists with the same name
 .PHONY: all clean
@@ -14,7 +15,7 @@ all: pmenu
 pmenu: prepare $(OBJS)
 	@echo "Creating object files..."
 	@echo "Creating binary..."
-	$(CC) $(CFLAGS) -o bin/pmenu $(OBJS)
+	$(CC) $(CFLAGS) -o bin/pmenu $(OBJS) $(LFLAGS)
 	@echo "Binary created at ./bin/pmenu"
 
 # Compile c files into object files
