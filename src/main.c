@@ -167,55 +167,43 @@ int main(int argc, char *argv[]) {
             if (TEST_MODE) { return EXIT_SUCCESS; }
 
 #if defined(PLATFORM_LINUX)
-            if (system("shutdown -P now > /dev/null 2>&1") == 0) {          // Works for most distros
-                break;
-            } else if (system("shutdown -h now > /dev/null 2>&1") == 0) {   // Gentoo
-                break;
-            } else if (system("loginctl poweroff > /dev/null 2>&1") == 0) { // Also Gentoo
-                break;
-            } else if (system("herd power-off root") == 0) {                // Guix
-                break;
-            } else {
-                printf("Failed to shut down\n");
-                return EXIT_FAILURE;
-            }
+            if (system("shutdown -P now") == 0)     return EXIT_SUCCESS; // Most distros
+            if (system("shutdown -h now") == 0)     return EXIT_SUCCESS; // Gentoo
+            if (system("loginctl poweroff") == 0)   return EXIT_SUCCESS; // Gentoo
+            if (system("herd power-off root") == 0) return EXIT_SUCCESS; // Guix
+
 #elif defined(PLATFORM_BSD)
-            system("shutdown -p now");
+            if (system("shutdown -p now") == 0) return EXIT_SUCCESS; // All BSD types
 #endif
+
+            printf("Failed to shut down\n");
+            return EXIT_FAILURE;
             break;
         case 1:
             printf("Rebooting...\n");
             if (TEST_MODE) { return EXIT_SUCCESS; }
 
-            if (system("loginctl reboot > /dev/null 2>&1") != 0) {          // Try for Gentoo first
-                break;
-            } else if (system("shutdown -r now > /dev/null 2>&1") != 0) {   // Works for most Linux distros and BSD
-                break;
-            } else {
-                printf("Failed to shut down\n");
-                return EXIT_FAILURE;
-            }
-        case 2: // Suspend
+            if (system("shutdown -r now") == 0) return EXIT_SUCCESS; // Most distros
+            if (system("loginctl reboot") == 0) return EXIT_SUCCESS; // Gentoo
+
+            printf("Failed to shut down\n");
+            return EXIT_FAILURE;
+        case 2:
             printf("Suspending...\n");
             if (TEST_MODE) { return EXIT_SUCCESS; }
 
 #if defined(PLATFORM_LINUX)
-            /* Try several ways of suspending */
-            if (system("systemctl suspend > /dev/null 2>&1") == 0) {
-                break;
-            } else if (system("loginctl suspend > /dev/null 2>&1") == 0) {
-                break;
-            } else if (system("pm-suspend > /dev/null 2>&1") == 0) {
-                break;
-            } else {
-                cleanup();
-                printf("Suspend not supported\n");
-                return EXIT_FAILURE;
-            }
-            /* ------------------------------ */
+            if (system("systemctl suspend") == 0) return EXIT_SUCCESS; // Systemd
+            if (system("loginctl suspend") == 0)  return EXIT_SUCCESS; // Systemd
+            if (system("pm-suspend") == 0)        return EXIT_SUCCESS; // Alternative / legacy
+
 #elif defined(PLATFORM_BSD)
-            system("zzz");
+            if (system("acpiconf -s 3") == 0) return EXIT_SUCCESS; // FreeBSD
+            if (system("zzz") == 0)           return EXIT_SUCCESS; // OpenBSD / NetBSD
 #endif
+
+            printf("Suspend not supported\n");
+            return EXIT_FAILURE;
             break;
         case 3:
             cancel_and_exit(EXIT_SUCCESS);
