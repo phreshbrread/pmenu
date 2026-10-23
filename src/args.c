@@ -11,11 +11,11 @@
 bool SHOW_HELP, NO_CONFIRM, NUM_SELECT, TEST_MODE, SHOW_VERSION, SHOW_NUMS = false;
 Argument valid_args[] = {
     { "  ",     "--help",           "Show this help message.",                      &SHOW_HELP    },
-    { "-d",     "--noconfirm",      "Disable confirmation window.",                 &NO_CONFIRM   },
-    { "-s",     "--num-select",     "Enable number key usage for menu options.",    &NUM_SELECT   },
+    { "-n",     "--noconfirm",      "Disable confirmation window.",                 &NO_CONFIRM   },
+    { "-N",     "--num-select",     "Enable number key usage for menu options.",    &NUM_SELECT   },
     { "-t",     "--testing",        "Disable menu functions.",                      &TEST_MODE    },
     { "-v",     "--version",        "Show current version.",                        &SHOW_VERSION },
-    { "-n",     "--show-nums",      "Display numbers before menu entries.",         &SHOW_NUMS    },
+    { "-s",     "--show-nums",      "Display numbers before menu entries.",         &SHOW_NUMS    },
 };
 
 int valid_args_count = sizeof(valid_args) / sizeof(valid_args[0]);
