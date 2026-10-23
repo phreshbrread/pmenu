@@ -7,13 +7,12 @@
 #include "pmenu.h"
 #include "args.h"
 
-/* Determine platform at compilation */
+/* --- Determine platform at compile-time --- */
 #if defined(__linux__)
 #define PLATFORM_LINUX
 #elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD)
 #define PLATFORM_BSD
 #endif
-/* --------------------------------- */
 
 int main(int argc, char *argv[]) {
     if (argc > 1) {
@@ -41,14 +40,13 @@ int main(int argc, char *argv[]) {
         longest_option_char_count = 8;
     }
 
-    /* Initialise ncurses */
+    /* --- Initialise ncurses --- */
     set_escdelay(50); // Set delay for escape key
     initscr();
     curs_set(0);
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
-    /* ------------------ */
 
     // Listen for mouse events
     mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
@@ -58,7 +56,7 @@ int main(int argc, char *argv[]) {
     // Allocate memory for array of ITEM pointers
     items = calloc(option_count, sizeof(ITEM *));
 
-    /* Create menu items from options array */
+    /* --- Create menu items from options array --- */
     for (int i = 0; i < option_count; ++i) {
         items[i] = new_item(new_options[i], new_options[i]);
     }
@@ -68,9 +66,8 @@ int main(int argc, char *argv[]) {
     menu_opts_off(power_menu, O_NONCYCLIC); // Force enable menu wrapping
     menu_opts_off(power_menu, O_SHOWDESC);  // Disable item descriptions
     set_menu_mark(power_menu, ">");         // Set menu marker
-    /* ------------------------------------ */
 
-    /* Create confirmation menu */
+    /* --- Create confirmation menu --- */
     confirm_items = calloc(3, sizeof(ITEM *));
     if (SHOW_NUMS) {
         confirm_items[0] = new_item("1. Yes",  NULL);
@@ -85,14 +82,13 @@ int main(int argc, char *argv[]) {
     menu_opts_off(confirm_menu, O_NONCYCLIC); // Force enable menu wrapping
     menu_opts_off(confirm_menu, O_SHOWDESC);  // Disable item descriptions
     set_menu_mark(confirm_menu, ">");         // Set menu marker
-    /* ------------------------ */
 
-    /* Create main window for menu */
+    /* --- Create main window for menu --- */
     // Create window using size of menu + padding
+    // TODO: This is kinda shit, ideally try a different way at some point
     menu_window = newwin(option_count + 4, longest_option_char_count + 10, max_y / 2 - option_count, max_x / 2 - longest_option_char_count);
 
     keypad(menu_window, TRUE);
-    /* ---------------------- */
 
     getmaxyx(menu_window, menu_win_max_y, menu_win_max_x);  // Get size of main menu window
     set_menu_win(power_menu, menu_window);                  // Assign power menu to the main menu window
@@ -124,7 +120,7 @@ int main(int argc, char *argv[]) {
         unpost_menu(power_menu);
         wrefresh(menu_window);
 
-        /* Confirmation */
+        /* --- Confirmation --- */
         if (NO_CONFIRM) { choice_confirmed = true; }
 
         if (!choice_confirmed) {
@@ -140,12 +136,12 @@ int main(int argc, char *argv[]) {
             unpost_menu(confirm_menu);
             wrefresh(menu_window);
         }
-        /* ------------ */
     }
 
+    // Exit ncurses window mode
     endwin();
 
-    /* Handle selected menu option */
+    /* --- Handle selected menu option --- */
     switch (selected_option_index) {
         case 0:
             printf("Shutting down...\n");
@@ -193,7 +189,6 @@ int main(int argc, char *argv[]) {
         case 3:
             cancel_and_exit(EXIT_SUCCESS);
     }
-    /* --------------------------- */
 
     cleanup();
     return EXIT_SUCCESS;
