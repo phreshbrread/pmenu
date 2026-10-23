@@ -14,7 +14,7 @@ stdenv.mkDerivation (finalAttrs: {
     owner = "phreshbrread";
     repo  = "pmenu";
     rev   = "v${finalAttrs.version}";
-    hash  = "sha256-FltThUR/KlBrOBXlM3Z7Y+Ljj46UDNqkHfg+0wKCJyE=";
+    hash  = "sha256-autWVZf0ZZujtYIehHq8k4XywlU/fKuKMp5CLqwNJRE=";
   };
 
   nativeBuildInputs = [
