@@ -23,6 +23,8 @@ extern MEVENT mouse_event;
 /* -------------- */
 
 /* Functions */
+void create_options(char *arr[]);
+
 int get_longest_option_char_count();
 
 void show_help_message();

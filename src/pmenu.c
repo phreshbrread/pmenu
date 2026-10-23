@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 #include <ncurses.h>
 #include <menu.h>
@@ -12,37 +11,48 @@ const char version[] = "1.5";
 
 int input, max_x, max_y, menu_win_max_x, menu_win_max_y = 0;
 
-/* Declare global variables */
-int       selected_option_index     = 3; // Default to 3 for cancel
-const int option_count              = 4; // 4 because array starts at 0
-int       longest_option_char_count = 8;
+/* --- Global Variables --- */
+int       selected_option_index           = 3; // Default to 3 for cancel
+const int option_count                    = 4; // 4 because array starts at 0
+int       longest_option_char_count       = 8;
+bool      enter_pressed, choice_confirmed = false;
 
-bool    enter_pressed, choice_confirmed = false;
-/* ------------------------ */
-
-/* Declare menu variables */
+// Main menu
 ITEM    **items;
 MENU    *power_menu;
 WINDOW  *menu_window;
 WINDOW  *menu_subwin;
 MEVENT  mouse_event;
 
+// Confirmation menu
 ITEM    **confirm_items;
 MENU    *confirm_menu;
 WINDOW  *confirm_menu_subwin;
-/* ---------------------- */
+
+void create_options(char *arr[]) {
+    if (SHOW_NUMS) {
+        arr[0] = "1. Shutdown";
+        arr[1] = "2. Reboot";
+        arr[2] = "3. Suspend";
+        arr[3] = "4. Cancel";
+    } else {
+        arr[0] = "Shutdown";
+        arr[1] = "Reboot";
+        arr[2] = "Suspend";
+        arr[3] = "Cancel";
+    }
+    arr[4] = NULL;
+}
 
 void cleanup() {
-    /* Free memory used by main menu */
+    /* --- Free memory used by menus --- */
     unpost_menu(power_menu);
     free_menu(power_menu);
     for (int i = 0; i < (option_count + 1); ++i) {
         free_item(items[i]);
     }
     free(items);
-    /* ----------------------------- */
 
-    /* Free confirm menu memory */
     unpost_menu(confirm_menu);
     free_menu(confirm_menu);
 
@@ -50,7 +60,6 @@ void cleanup() {
         free_item(confirm_items[i]);
     }
     free(confirm_items);
-    /* ------------------------ */
 
     delwin(menu_subwin);
     delwin(menu_window);
@@ -66,10 +75,10 @@ void cancel_and_exit(int exit_code) {
 int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_interface_with) {
     menu_driver(menu_to_interface_with, REQ_FIRST_ITEM);
 
-    /* Handle input */
+    // Input handler
     while ((input = wgetch(window_to_interface_with))) {
         switch (input) {
-            /* Keyboard inputs */
+            /* --- Keyboard --- */
             case '\n':
             case '\r':
             case KEY_ENTER:
@@ -104,9 +113,8 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
             case 27: // 27 is the raw value of ESC
                 return 3;
                 break;
-                /* --------------- */
 
-                /* Mouse inputs */
+                /* --- Mouse --- */
             case KEY_MOUSE:
                 if(getmouse(&mouse_event) != OK) { break; }
 
@@ -134,13 +142,13 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
                         return 3;
                         break;
                 }
-                /* ------------ */
         }
 
-        if (enter_pressed) { break; } // Break free of while loop
+        // Exit while loop
+        if (enter_pressed) { break; }
     }
-    /* ------------ */
 
-    enter_pressed = false; // Revert enter state
-    return item_index(current_item(menu_to_interface_with)); // Return index of the selected option
+    // Revert enter state and return index of selected option
+    enter_pressed = false;
+    return item_index(current_item(menu_to_interface_with));
 }

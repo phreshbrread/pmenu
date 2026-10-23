@@ -15,21 +15,6 @@
 #endif
 /* --------------------------------- */
 
-void create_options(char *arr[]) {
-    if (SHOW_NUMS) {
-        arr[0] = "1. Shutdown";
-        arr[1] = "2. Reboot";
-        arr[2] = "3. Suspend";
-        arr[3] = "4. Cancel";
-    } else {
-        arr[0] = "Shutdown";
-        arr[1] = "Reboot";
-        arr[2] = "Suspend";
-        arr[3] = "Cancel";
-    }
-    arr[4] = NULL;
-}
-
 int main(int argc, char *argv[]) {
     if (argc > 1) {
         set_flags(argc, argv);
