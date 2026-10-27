@@ -148,10 +148,11 @@ int main(int argc, char *argv[]) {
             if (TEST_MODE) { return EXIT_SUCCESS; }
 
 #if defined(PLATFORM_LINUX)
-            if (system("shutdown -P now") == 0)     return EXIT_SUCCESS; // Most distros
-            if (system("shutdown -h now") == 0)     return EXIT_SUCCESS; // Gentoo
-            if (system("loginctl poweroff") == 0)   return EXIT_SUCCESS; // Gentoo
+            if (system("shutdown -P now")     == 0) return EXIT_SUCCESS; // Most distros
+            if (system("shutdown -h now")     == 0) return EXIT_SUCCESS; // Gentoo
+            if (system("loginctl poweroff")   == 0) return EXIT_SUCCESS; // Gentoo
             if (system("herd power-off root") == 0) return EXIT_SUCCESS; // Guix
+            if (system("poweroff")            == 0) return EXIT_SUCCESS; // Alpine / Busybox
 
 #elif defined(PLATFORM_BSD)
             if (system("shutdown -p now") == 0) return EXIT_SUCCESS; // All BSD types
