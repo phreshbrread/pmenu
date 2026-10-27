@@ -3,13 +3,16 @@ CFLAGS = -Wall -Wextra
 LFLAGS = -ltinfo -lmenu -lncurses
 
 # Run these steps even if a file exists with the same name
-.PHONY: all clean
+.PHONY: all clean run
 
 # Define object files
 OBJS = obj/args.o obj/pmenu.o obj/main.o
 
 # Default step when simply running 'make'
 all: pmenu
+
+run: all
+	./bin/pmenu -t
 
 # Link object files into main executable
 pmenu: prepare $(OBJS)
