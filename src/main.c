@@ -7,7 +7,7 @@
 #include "pmenu.h"
 #include "args.h"
 
-/* --- Determine platform at compile-time --- */
+/* --- Get platform at compile-time --- */
 #if defined(__linux__)
 #define PLATFORM_LINUX
 #elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD)
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     char *new_options[4];
     create_options(new_options);
 
-    // Determine length of longest menu option
+    // Set length of longest menu option
     if (SHOW_NUMS) {
         longest_option_char_count = 12;
     } else {
