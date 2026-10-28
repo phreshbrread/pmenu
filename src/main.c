@@ -67,27 +67,24 @@ int main(int argc, char *argv[]) {
     menu_opts_off(power_menu, O_SHOWDESC);  // Disable item descriptions
     set_menu_mark(power_menu, ">");         // Set menu marker
 
-    /* --- Create confirmation menu --- */
-    confirm_items = calloc(3, sizeof(ITEM *));
-    if (SHOW_NUMS) {
-        confirm_items[0] = new_item("1. Yes",  NULL);
-        confirm_items[1] = new_item("2. No",   NULL);
-    } else {
-        confirm_items[0] = new_item("Yes",  NULL);
-        confirm_items[1] = new_item("No",   NULL);
-    }
-    confirm_items[2] = (ITEM *)NULL;
-
-    confirm_menu = new_menu((ITEM **)confirm_items);
-    menu_opts_off(confirm_menu, O_NONCYCLIC); // Force enable menu wrapping
-    menu_opts_off(confirm_menu, O_SHOWDESC);  // Disable item descriptions
-    set_menu_mark(confirm_menu, ">");         // Set menu marker
+    // Create confirmation menu
+    create_confirm_menu(SHOW_NUMS);
 
     /* --- Create main window for menu --- */
-    // Create window using size of menu + padding
-    // TODO: This is kinda shit, ideally try a different way at some point
-    menu_window = newwin(option_count + 4, longest_option_char_count + 10, max_y / 2 - option_count, max_x / 2 - longest_option_char_count);
+    // Set dimensions
+    MenuDims menu_dims = {
+        option_count + 4,
+        longest_option_char_count + 10,
+        max_y / 2 - option_count,
+        max_x / 2 - longest_option_char_count
+    };
 
+    // Create window & enable keypad mode
+    menu_window = newwin(
+            menu_dims.lines,
+            menu_dims.cols,
+            menu_dims.begin_y,
+            menu_dims.begin_x);
     keypad(menu_window, TRUE);
 
     getmaxyx(menu_window, menu_win_max_y, menu_win_max_x);  // Get size of main menu window

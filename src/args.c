@@ -7,7 +7,6 @@
 #include "args.h"
 #include "pmenu.h"
 
-// Args
 bool SHOW_HELP, NO_CONFIRM, NUM_SELECT, TEST_MODE, SHOW_VERSION, SHOW_NUMS = false;
 Argument valid_args[] = {
     { "  ",     "--help",           "Show this help message.",                      &SHOW_HELP    },
@@ -31,8 +30,13 @@ void show_help_message() {
 void set_flags(int argc, char **argv) {
     int activated_flags = 0;
 
-    for (int i = 1; i < argc; ++i) {                 // For each entry in argv[]
-        for (int j = 0; j < valid_args_count; ++j) { // For each valid argument
+    // For each entry in argv[]
+    for (int i = 1; i < argc; ++i) {
+
+        // For each valid argument
+        for (int j = 0; j < valid_args_count; ++j) {
+
+            // If either the short or longhand matches
             if (strcmp(valid_args[j].shorthand, argv[i]) == 0 || strcmp(valid_args[j].longhand, argv[i]) == 0) {
                 *valid_args[j].flag_enabled = true;
                 ++activated_flags;

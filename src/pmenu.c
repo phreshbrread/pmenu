@@ -7,7 +7,7 @@
 #include "pmenu.h"
 #include "args.h"
 
-const char version[] = "1.5.1";
+const char version[] = "1.5.2";
 
 int input, max_x, max_y, menu_win_max_x, menu_win_max_y = 0;
 
@@ -152,3 +152,21 @@ int get_user_selection_index(WINDOW *window_to_interface_with, MENU *menu_to_int
     enter_pressed = false;
     return item_index(current_item(menu_to_interface_with));
 }
+
+void create_confirm_menu(bool show_nums) {
+    confirm_items = calloc(3, sizeof(ITEM *));
+    if (show_nums) {
+        confirm_items[0] = new_item("1. Yes",  NULL);
+        confirm_items[1] = new_item("2. No",   NULL);
+    } else {
+        confirm_items[0] = new_item("Yes",  NULL);
+        confirm_items[1] = new_item("No",   NULL);
+    }
+    confirm_items[2] = (ITEM *)NULL;
+
+    confirm_menu = new_menu((ITEM **)confirm_items);
+
+    menu_opts_off(confirm_menu, O_NONCYCLIC); // Force enable menu wrapping
+    menu_opts_off(confirm_menu, O_SHOWDESC);  // Disable item descriptions
+    set_menu_mark(confirm_menu, ">");         // Set menu marker
+};
